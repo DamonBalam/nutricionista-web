@@ -19,6 +19,7 @@
           flat
           icon="o_power_settings_new"
           label="Cerrar Sesión"
+          @click="logout"
         />
       </div>
     </q-drawer>
@@ -30,36 +31,37 @@
 </template>
 
 <script setup lang="ts">
-import EssentialLink, {
-  EssentialLinkProps,
-} from "components/EssentialLink.vue";
+import { useRouter } from 'vue-router'
+import EssentialLink, { EssentialLinkProps } from 'components/EssentialLink.vue'
 
 const essentialLinks: EssentialLinkProps[] = [
   {
-    title: "Inicio",
-    icon: "o_home",
-    link: "/",
+    title: 'Inicio',
+    icon: 'o_home',
+    link: '/'
   },
   {
-    title: "Pacientes",
-    icon: "o_account_circle",
-    link: "/pacientes",
+    title: 'Pacientes',
+    icon: 'o_account_circle',
+    link: '/pacientes'
   },
   {
-    title: "Productos",
-    icon: "o_shopping_cart",
-    link: "/productos",
+    title: 'Productos',
+    icon: 'o_shopping_cart',
+    link: '/productos'
   },
   {
-    title: "Ajustes",
-    icon: "o_settings",
-    link: "/ajustes",
-  },
-];
+    title: 'Ajustes',
+    icon: 'o_settings',
+    link: '/ajustes'
+  }
+]
+const router = useRouter()
+const leftDrawerOpen = true
 
-const leftDrawerOpen = true;
-
-// function toggleLeftDrawer() {
-//   leftDrawerOpen.value = !leftDrawerOpen.value
-// }
+function logout() {
+  localStorage.clear()
+  router.push('/login')
+  console.log('logout')
+}
 </script>

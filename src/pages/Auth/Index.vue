@@ -1,8 +1,19 @@
 <script setup lang="ts">
-import { ref } from "vue";
-const usuario = ref("");
-const password = ref("");
-const accept = ref(false);
+import { ref } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+const usuario = ref('')
+const password = ref('')
+const accept = ref(false)
+
+const router = useRouter()
+function handleSubmit () {
+  if (usuario.value === 'admin' && password.value === 'admin') {
+    localStorage.setItem('access_token', '123456789')
+    router.push('/pacientes')
+  } else {
+    alert('Usuario o contraseña incorrectos')
+  }
+}
 </script>
 
 <template>
@@ -12,7 +23,7 @@ const accept = ref(false);
         <q-img src="../../assets/Logo.png" width="200px" />
       </div>
 
-      <q-form class="q-gutter-md q-mx-xl q-my-xl" @submit="$router.push('/')">
+      <q-form class="q-gutter-md q-mx-xl q-my-xl" @submit="handleSubmit">
         <div class="row justify-center">
           <h3 class="text-primary">¡Bienvenida!</h3>
         </div>
@@ -45,7 +56,12 @@ const accept = ref(false);
         </div>
 
         <div class="row justify-center">
-          <q-btn style="width: 200px;" label="Iniciar Sesión" type="submit" color="primary" />
+          <q-btn
+            style="width: 200px"
+            label="Iniciar Sesión"
+            type="submit"
+            color="primary"
+          />
         </div>
       </q-form>
     </div>

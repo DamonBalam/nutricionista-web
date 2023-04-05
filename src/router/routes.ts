@@ -1,32 +1,70 @@
-import { RouteRecordRaw } from 'vue-router';
+import { RouteRecordRaw } from "vue-router";
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/Inicio/Index.vue') }],
+    path: "/login",
+    name: "Login",
+    component: () => import("layouts/AuthLayout.vue"),
+    children: [{ path: "", component: () => import("pages/Auth/Index.vue") }],
   },
   {
-    path: '/pacientes',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/Pacientes/Index.vue') }],
+    path: "/",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("pages/Inicio/Index.vue"),
+        meta: {
+          requiresAuth: true,
+        },
+      },
+    ],
   },
   {
-    path: '/productos',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/Productos/Index.vue') }],
+    path: "/pacientes",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("pages/Pacientes/Index.vue"),
+        meta: {
+          requiresAuth: true,
+        },
+      },
+    ],
   },
   {
-    path: '/ajustes',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/Ajustes/Index.vue') }],
+    path: "/productos",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("pages/Productos/Index.vue"),
+        meta: {
+          requiresAuth: true,
+        },
+      },
+    ],
+  },
+  {
+    path: "/ajustes",
+    component: () => import("layouts/MainLayout.vue"),
+    children: [
+      {
+        path: "",
+        component: () => import("pages/Ajustes/Index.vue"),
+        meta: {
+          requiresAuth: true,
+        },
+      },
+    ],
   },
 
   // Always leave this as last one,
   // but you can also remove it
   {
-    path: '/:catchAll(.*)*',
-    component: () => import('pages/ErrorNotFound.vue'),
+    path: "/:catchAll(.*)*",
+    component: () => import("pages/ErrorNotFound.vue"),
   },
 ];
 

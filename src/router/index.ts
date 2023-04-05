@@ -33,5 +33,17 @@ export default route(function (/* { store, ssrContext } */) {
     // history: createHistory(process.env.VUE_ROUTER_BASE),
   });
 
+  Router.beforeEach((to, from, next) => {
+    if (to.matched.some((record) => record.meta.requiresAuth)) {
+      if (localStorage.getItem("access_token")) {
+        next();
+      } else {
+        next({ path: "/login" });
+      }
+    } else {
+      next();
+    }
+  });
+
   return Router;
 });

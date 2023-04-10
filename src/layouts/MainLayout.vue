@@ -19,6 +19,7 @@
           flat
           icon="o_power_settings_new"
           label="Cerrar Sesión"
+          class="text-bold"
           @click="logout"
         />
       </div>

@@ -9,7 +9,7 @@ const router = useRouter()
 function handleSubmit () {
   if (usuario.value === 'admin' && password.value === 'admin') {
     localStorage.setItem('access_token', '123456789')
-    router.push('/pacientes')
+    router.push('/inicio')
   } else {
     alert('Usuario o contraseña incorrectos')
   }
@@ -23,11 +23,16 @@ function handleSubmit () {
         <q-img src="../../assets/Logo.png" width="200px" />
       </div>
 
-      <q-form class="q-gutter-md q-mx-xl q-my-xl" @submit="handleSubmit">
+      <q-form class="q-gutter-md q-mx-xl q-my-xl q-pt-xl" @submit="handleSubmit">
         <div class="row justify-center">
-          <h3 class="text-primary">¡Bienvenida!</h3>
+          <h3 class="text-primary text-bold">¡Bienvenida!</h3>
+        </div>
+
+        <div class="q-mb-none">
+          <label for="email" class="text-bold">Correo electrónico</label>
         </div>
         <q-input
+          id="email"
           rounded
           outlined
           v-model="usuario"
@@ -37,7 +42,11 @@ function handleSubmit () {
             <q-icon name="o_email" />
           </template>
         </q-input>
+        <div class="q-mt-lg">
+          <label for="password" class="text-bold">Contraseña</label>
+        </div>
         <q-input
+          id="password"
           rounded
           outlined
           v-model="password"
@@ -57,8 +66,8 @@ function handleSubmit () {
 
         <div class="row justify-center">
           <q-btn
-            style="width: 200px"
             label="Iniciar Sesión"
+            rounded
             type="submit"
             color="primary"
           />

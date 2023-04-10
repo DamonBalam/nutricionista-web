@@ -9,49 +9,32 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: "/",
+    redirect: "/inicio",
     component: () => import("layouts/MainLayout.vue"),
     children: [
       {
-        path: "",
+        path: "/inicio",
         component: () => import("pages/Inicio/Index.vue"),
         meta: {
           requiresAuth: true,
         },
       },
-    ],
-  },
-  {
-    path: "/pacientes",
-    component: () => import("layouts/MainLayout.vue"),
-    children: [
       {
-        path: "",
+        path: "/pacientes",
         component: () => import("pages/Pacientes/Index.vue"),
         meta: {
           requiresAuth: true,
         },
       },
-    ],
-  },
-  {
-    path: "/productos",
-    component: () => import("layouts/MainLayout.vue"),
-    children: [
       {
-        path: "",
+        path: "/productos",
         component: () => import("pages/Productos/Index.vue"),
         meta: {
           requiresAuth: true,
         },
       },
-    ],
-  },
-  {
-    path: "/ajustes",
-    component: () => import("layouts/MainLayout.vue"),
-    children: [
       {
-        path: "",
+        path: "/ajustes",
         component: () => import("pages/Ajustes/Index.vue"),
         meta: {
           requiresAuth: true,

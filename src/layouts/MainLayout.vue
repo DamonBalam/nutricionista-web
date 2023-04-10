@@ -39,7 +39,7 @@ const essentialLinks: EssentialLinkProps[] = [
   {
     title: 'Inicio',
     icon: 'o_home',
-    link: '/'
+    link: '/inicio'
   },
   {
     title: 'Pacientes',

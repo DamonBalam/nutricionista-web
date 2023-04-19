@@ -56,7 +56,7 @@ const address = ref('')
       row-key="name"
       :hide-pagination="true"
       table-header-class="bg-black text-white"
-      table-class="text-bold"
+
     >
       <template v-slot:body-cell-accion="props">
         <q-td :props="props">

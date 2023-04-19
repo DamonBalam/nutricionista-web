@@ -1,41 +1,16 @@
 <template>
-  <q-page class="fondo-gris">
-    PAGE PRODUCTOS
+  <q-page class="fondo-gris q-py-md q-px-xl">
+    <Notification />
+    <TableProducto/>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { Todo, Meta } from 'components/models';
-import { ref } from 'vue';
-
-const todos = ref<Todo[]>([
-  {
-    id: 1,
-    content: 'ct1'
-  },
-  {
-    id: 2,
-    content: 'ct2'
-  },
-  {
-    id: 3,
-    content: 'ct3'
-  },
-  {
-    id: 4,
-    content: 'ct4'
-  },
-  {
-    id: 5,
-    content: 'ct5'
-  }
-]);
-const meta = ref<Meta>({
-  totalCount: 1200
-});
+import Notification from '../../components/Notification.vue'
+import TableProducto from '../../components/TableProducto.vue'
 </script>
 <style scoped lang="scss">
 .fondo-gris {
-  background-color: #EEEEEE;
+  background-color: #eeeeee;
 }
 </style>

@@ -23,16 +23,17 @@ function handleSubmit () {
         <q-img src="../../assets/Logo.png" width="200px" />
       </div>
 
-      <q-form class="q-gutter-md q-mx-xl q-my-xl q-pt-xl" @submit="handleSubmit">
-        <div class="row justify-center">
-          <h3 class="text-primary text-bold">¡Bienvenida!</h3>
-        </div>
+      <div class="row justify-center  q-my-xl q-pt-xl">
+        <h3 class="text-primary text-bold">¡Bienvenida!</h3>
+      </div>
+      <q-form class="q-gutter-md q-mx-auto" style="width: 420px;" @submit="handleSubmit">
 
         <div class="q-mb-none">
           <label for="email" class="text-bold">Correo electrónico</label>
         </div>
         <q-input
           id="email"
+          dense
           rounded
           outlined
           v-model="usuario"
@@ -48,6 +49,7 @@ function handleSubmit () {
         <q-input
           id="password"
           rounded
+          dense
           outlined
           v-model="password"
           label="Ingresa tu contraseña"
@@ -57,14 +59,14 @@ function handleSubmit () {
           </template>
         </q-input>
 
-        <div class="row justify-between items-center">
-          <q-toggle v-model="accept" label="Recordar contraseña" />
-          <router-link to="/pacientes" class="text-primary"
+        <div class="row justify-between items-center q-mt-lg">
+          <q-toggle dense v-model="accept" label="Recordar contraseña" size="sm" style="font-size: 14px;" />
+          <router-link to="/pacientes" class="text-primary" style="font-size: 14px;"
             >¿Has olvidado tu contraseña?</router-link
           >
         </div>
 
-        <div class="row justify-center">
+        <div class="row justify-center q-mt-xl">
           <q-btn
             label="Iniciar Sesión"
             rounded

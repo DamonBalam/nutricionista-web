@@ -7,7 +7,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import Notification from '../../components/Notification.vue'
 import TableColaborador from '../../components/TableColaborador.vue'
 import TableConsultorio from '../../components/TableConsultorio.vue'

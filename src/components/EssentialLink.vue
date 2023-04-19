@@ -12,7 +12,7 @@
     </q-item-section>
 
     <q-item-section>
-      <q-item-label ><span class="text-bold">{{ title }}</span></q-item-label>
+      <q-item-label ><span >{{ title }}</span></q-item-label>
     </q-item-section>
   </q-item>
 </template>

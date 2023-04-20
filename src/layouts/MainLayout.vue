@@ -20,7 +20,7 @@
           icon="o_power_settings_new"
           label="Cerrar Sesión"
           class="text-bold"
-          @click="logout"
+          @click="handleSubmit"
         />
       </div>
     </q-drawer>
@@ -34,7 +34,10 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import EssentialLink, { EssentialLinkProps } from 'components/EssentialLink.vue'
+import { useAuthStore } from 'stores/auth'
 
+const store = useAuthStore()
+const { logout } = store
 const essentialLinks: EssentialLinkProps[] = [
   {
     title: 'Inicio',
@@ -57,12 +60,9 @@ const essentialLinks: EssentialLinkProps[] = [
     link: '/ajustes'
   }
 ]
-const router = useRouter()
-const leftDrawerOpen = true
 
-function logout() {
-  localStorage.clear()
-  router.push('/login')
-  console.log('logout')
+const leftDrawerOpen = true
+function handleSubmit() {
+  logout()
 }
 </script>

@@ -1,8 +1,8 @@
-
 // Incluimos la librería que permite realizar el consumo de servicios REST
-import Axios, {AxiosRequestConfig} from "axios";
+import { useAuthStore } from 'stores/auth'
+import Axios, { AxiosRequestConfig } from 'axios'
 // Incluimos la instancia Vuex
-import store from "../../stores/index";
+
 //Incluimos interceptores
 // import {setupInterceptorsTo} from '@/common/interceptors';
 
@@ -45,21 +45,21 @@ import store from "../../stores/index";
  *
  */
 const formatRequestURL = (url: string, params: any) => {
-    if (params) {
-        // Si existe el objeto params, iteramos
-        // en cada propiedad de éste y la reemplazamos
-        // en la url
-        Object.keys(params).forEach((key) => {
-            // Por cada propiedad, generamos una expresión
-            // regular para realizar la sustitución global
-            // del nombre del parámetro por su valor
-            let pattern = RegExp(`{{${key}}}`, "g");
-            url = url.replace(pattern, params[key]);
-        });
-    }
+  if (params) {
+    // Si existe el objeto params, iteramos
+    // en cada propiedad de éste y la reemplazamos
+    // en la url
+    Object.keys(params).forEach(key => {
+      // Por cada propiedad, generamos una expresión
+      // regular para realizar la sustitución global
+      // del nombre del parámetro por su valor
+      let pattern = RegExp(`{{${key}}}`, 'g')
+      url = url.replace(pattern, params[key])
+    })
+  }
 
-    return url;
-};
+  return url
+}
 
 /**
  * Método base para realizar la llamada al servicio REST. Se encarga de
@@ -92,56 +92,60 @@ interface JsonArray extends Array<JsonPrimitive | JsonArray | JsonMap> {}
 type Json = JsonPrimitive | JsonMap | JsonArray
 
 interface Payload {
-    params?: Json | any
-    data?: Json | any
-    headers?: Json | any
+  params?: Json | any
+  data?: Json | any
+  headers?: Json | any
 }
 
+// const store = useAuthStore()
+// const { token } = storeToRefs(store)
+
 const doRequest = (method: string, url: string, payload: Payload) => {
-    // Iniciamos el LOADER
-    // store.dispatch("initStore/initLoader");
-    payload = payload ? payload : {} as Payload;
-    // Obtenemos la información de parametros, headers y contenido (datos)
-    // que se van a enviar a la servicio REST
-    //
-    // @see Object destructuring (https://developer.mozilla.org/es/docs/Web/JavaScript/Referencia/Operadores/Destructuring_assignment)
-    //
-    let { params = {}, data = {}, headers = {} } = payload;
+  // Iniciamos el LOADER
+  // store.dispatch("initStore/initLoader");
+  payload = payload ? payload : ({} as Payload)
+  // Obtenemos la información de parametros, headers y contenido (datos)
+  // que se van a enviar a la servicio REST
+  //
+  // @see Object destructuring (https://developer.mozilla.org/es/docs/Web/JavaScript/Referencia/Operadores/Destructuring_assignment)
+  //
+  let { params = {}, data = {}, headers = {} } = payload
 
-    // Creamos el header por default
-    // content-type = 'application/json'
-    let requestHeaders: Json = {
-        "content-type": "application/json",
-    };
+  // Creamos el header por default
+  // content-type = 'application/json'
+  let requestHeaders: Json = {
+    'content-type': 'application/json'
+  }
 
-    // let token = store.getters["auth/token"];
-    let token = localStorage.getItem("token");
-    if (token) {
-        requestHeaders["Authorization"] = `Bearer ${token}`;
-    }
+  // let token = store.getters["auth/token"];
+  // let token = localStorage.getItem('access_token')
+  const { token } = useAuthStore()
+  if (token) {
+    requestHeaders['Authorization'] = `Bearer ${token}`
+  }
 
-    // Realizamos el merge con los headers indicados en el parámetro header
-    // de manera que si el header indica un content-type diferente
-    // se utilice dicho content-type
-    // @see Spread operator https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Operators/Spread_syntax
-    const mergeHeaders = {...requestHeaders, ...headers}
+  // Realizamos el merge con los headers indicados en el parámetro header
+  // de manera que si el header indica un content-type diferente
+  // se utilice dicho content-type
+  // @see Spread operator https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Operators/Spread_syntax
+  const mergeHeaders = { ...requestHeaders, ...headers }
 
-    // Se realiza el proceso de sustitución de parámetros en la URL
-    url = formatRequestURL(url, params);
+  // Se realiza el proceso de sustitución de parámetros en la URL
+  url = formatRequestURL(url, params)
 
-    //Creamos la instancia y le asociamos los interceptores
-    // let axios = setupInterceptorsTo(Axios.create())
-    let axios = Axios.create()
+  //Creamos la instancia y le asociamos los interceptores
+  // let axios = setupInterceptorsTo(Axios.create())
+  let axios = Axios.create()
 
-    // Realizamos la petición al servicio REST
-    return axios({
-        baseURL: process.env.VUE_APP_BASEURL,
-        url: url,
-        method: method,
-        data: data,
-        headers: mergeHeaders,
-    } as AxiosRequestConfig);
-};
+  // Realizamos la petición al servicio REST
+  return axios({
+    baseURL: 'https://nutricionista-api.herokuapp.com/api/',
+    url: url,
+    method: method,
+    data: data,
+    headers: mergeHeaders
+  } as AxiosRequestConfig)
+}
 
 /**
  * Definimos el API con los métodos get, post, put, delete y patch para hacer
@@ -149,93 +153,93 @@ const doRequest = (method: string, url: string, payload: Payload) => {
  */
 
 export const API = {
-    /**
-     * Consume un servicio REST utilizando el método GET.
-     *
-     * @param {String} url URL del servicio REST que se desea consumir. @see formatRequestURL
-     * @param {Object} payload
-     *
-     * {
-     *    params: {},
-     *    data: {},
-     *    headers: {}
-     * }
-     *  params (OPTIONAL): Un objeto que contiene los valores de los parámetros que serán reemplazados en la URL. @see formatRequestURL
-     *  headers (OPTIONAL): Valores que serán enviados en el header
-     */
-    get: (url: string, payload: Payload) => {
-        payload = payload ? payload : {} as Payload;
-        let { params = null } = payload;
-        if (params) {
-            return doRequest("GET", url, payload);
-        } else {
-            return doRequest("GET", url, { params } as Payload);
-        }
-    },
-    /**
-     * Consume un servicio REST utilizando el método POST.
-     *
-     * @param {String} url URL del servicio REST que se desea consumir. @see formatRequestURL
-     * @param {Object} payload
-     *  Un objeto que contiene los valores de los parámetros que serán reemplazados en la URL. @see formatRequestURL
-     *  y también los valores que serán enviados dentro del BODY (post).
-     *
-     * {
-     *    params: {},
-     *    data: {},
-     *    headers: {}
-     * }
-     */
-    post: (url: string, payload: Payload) => {
-        return doRequest("POST", url, payload);
-    },
-    /**
-     * Consume un servicio REST utilizando el método PUT.
-     *
-     * @param {String} url URL del servicio REST que se desea consumir. @see formatRequestURL
-     * @param {Object} payload
-     *  Un objeto que contiene los valores de los parámetros que serán reemplazados en la URL. @see formatRequestURL
-     *  y también los valores que serán enviados dentro del BODY (post).
-     *
-     * {
-     *    params: {},
-     *    data: {},
-     *    headers: {}
-     * }   */
-    put: (url: string, payload: Payload) => {
-        return doRequest("PUT", url, payload);
-    },
-    /**
-     * Consume un servicio REST utilizando el método PATCH.
-     *
-     * @param {String} url URL del servicio REST que se desea consumir. @see formatRequestURL
-     * @param {Object} payload
-     *  Un objeto que contiene los valores de los parámetros que serán reemplazados en la URL. @see formatRequestURL
-     *  y también los valores que serán enviados dentro del BODY (post).
-     *
-     * {
-     *    params: {},
-     *    data: {},
-     *    headers: {}
-     * }  */
-    patch: (url: string, payload: Payload) => {
-        return doRequest("PATCH", url, payload);
-    },
-    /**
-     * Consume un servicio REST utilizando el método DELETE.
-     *
-     * @param {String} url URL del servicio REST que se desea consumir. @see formatRequestURL
-     * @param {Object} payload
-     *  Un objeto que contiene los valores de los parámetros que serán reemplazados en la URL. @see formatRequestURL
-     *  y también los valores que serán enviados dentro del BODY (post).
-     *
-     * {
-     *    params: {},
-     *    data: {},
-     *    headers: {}
-     * }
-     */
-    delete: (url: string, payload: Payload) => {
-        return doRequest("DELETE", url, payload);
-    },
-};
+  /**
+   * Consume un servicio REST utilizando el método GET.
+   *
+   * @param {String} url URL del servicio REST que se desea consumir. @see formatRequestURL
+   * @param {Object} payload
+   *
+   * {
+   *    params: {},
+   *    data: {},
+   *    headers: {}
+   * }
+   *  params (OPTIONAL): Un objeto que contiene los valores de los parámetros que serán reemplazados en la URL. @see formatRequestURL
+   *  headers (OPTIONAL): Valores que serán enviados en el header
+   */
+  get: (url: string, payload: Payload) => {
+    payload = payload ? payload : ({} as Payload)
+    let { params = null } = payload
+    if (params) {
+      return doRequest('GET', url, payload)
+    } else {
+      return doRequest('GET', url, { params } as Payload)
+    }
+  },
+  /**
+   * Consume un servicio REST utilizando el método POST.
+   *
+   * @param {String} url URL del servicio REST que se desea consumir. @see formatRequestURL
+   * @param {Object} payload
+   *  Un objeto que contiene los valores de los parámetros que serán reemplazados en la URL. @see formatRequestURL
+   *  y también los valores que serán enviados dentro del BODY (post).
+   *
+   * {
+   *    params: {},
+   *    data: {},
+   *    headers: {}
+   * }
+   */
+  post: (url: string, payload: Payload) => {
+    return doRequest('POST', url, payload)
+  },
+  /**
+   * Consume un servicio REST utilizando el método PUT.
+   *
+   * @param {String} url URL del servicio REST que se desea consumir. @see formatRequestURL
+   * @param {Object} payload
+   *  Un objeto que contiene los valores de los parámetros que serán reemplazados en la URL. @see formatRequestURL
+   *  y también los valores que serán enviados dentro del BODY (post).
+   *
+   * {
+   *    params: {},
+   *    data: {},
+   *    headers: {}
+   * }   */
+  put: (url: string, payload: Payload) => {
+    return doRequest('PUT', url, payload)
+  },
+  /**
+   * Consume un servicio REST utilizando el método PATCH.
+   *
+   * @param {String} url URL del servicio REST que se desea consumir. @see formatRequestURL
+   * @param {Object} payload
+   *  Un objeto que contiene los valores de los parámetros que serán reemplazados en la URL. @see formatRequestURL
+   *  y también los valores que serán enviados dentro del BODY (post).
+   *
+   * {
+   *    params: {},
+   *    data: {},
+   *    headers: {}
+   * }  */
+  patch: (url: string, payload: Payload) => {
+    return doRequest('PATCH', url, payload)
+  },
+  /**
+   * Consume un servicio REST utilizando el método DELETE.
+   *
+   * @param {String} url URL del servicio REST que se desea consumir. @see formatRequestURL
+   * @param {Object} payload
+   *  Un objeto que contiene los valores de los parámetros que serán reemplazados en la URL. @see formatRequestURL
+   *  y también los valores que serán enviados dentro del BODY (post).
+   *
+   * {
+   *    params: {},
+   *    data: {},
+   *    headers: {}
+   * }
+   */
+  delete: (url: string, payload: Payload) => {
+    return doRequest('DELETE', url, payload)
+  }
+}

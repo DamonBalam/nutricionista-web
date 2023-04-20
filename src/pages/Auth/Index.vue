@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useAuthStore } from 'stores/auth'
+
+const store = useAuthStore()
+
+const { login } = store
+
 const usuario = ref('')
 const password = ref('')
 const accept = ref(false)
 
-const router = useRouter()
 function handleSubmit () {
-  if (usuario.value === 'admin' && password.value === 'admin') {
-    localStorage.setItem('access_token', '123456789')
-    router.push('/inicio')
-  } else {
-    alert('Usuario o contraseña incorrectos')
-  }
+  login({ email: usuario.value, password: password.value })
 }
 </script>
 
@@ -23,11 +22,14 @@ function handleSubmit () {
         <q-img src="../../assets/Logo.png" width="200px" />
       </div>
 
-      <div class="row justify-center  q-my-xl q-pt-xl">
+      <div class="row justify-center q-my-xl q-pt-xl">
         <h3 class="text-primary text-bold">¡Bienvenida!</h3>
       </div>
-      <q-form class="q-gutter-md q-mx-auto" style="width: 420px;" @submit="handleSubmit">
-
+      <q-form
+        class="q-gutter-md q-mx-auto"
+        style="width: 420px"
+        @submit="handleSubmit"
+      >
         <div class="q-mb-none">
           <label for="email" class="text-bold">Correo electrónico</label>
         </div>
@@ -60,19 +62,23 @@ function handleSubmit () {
         </q-input>
 
         <div class="row justify-between items-center q-mt-lg">
-          <q-toggle dense v-model="accept" label="Recordar contraseña" size="sm" style="font-size: 14px;" />
-          <router-link to="/pacientes" class="text-primary" style="font-size: 14px;"
+          <q-toggle
+            dense
+            v-model="accept"
+            label="Recordar contraseña"
+            size="sm"
+            style="font-size: 14px"
+          />
+          <router-link
+            to="/pacientes"
+            class="text-primary"
+            style="font-size: 14px"
             >¿Has olvidado tu contraseña?</router-link
           >
         </div>
 
         <div class="row justify-center q-mt-xl">
-          <q-btn
-            label="Iniciar Sesión"
-            rounded
-            type="submit"
-            color="primary"
-          />
+          <q-btn label="Iniciar Sesión" rounded type="submit" color="primary" />
         </div>
       </q-form>
     </div>

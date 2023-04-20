@@ -5,7 +5,7 @@
       <span class="text-black text-bold text-h5">Producto Nuevo</span>
     </div>
     <div class="row q-mt-lg">
-      <div class="col-6 q-px-md">
+      <div class="col-4 q-px-md">
         <q-card flat class="q-pa-md" style="height: 620px">
           <q-card-section>
             <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
@@ -64,7 +64,7 @@
           </q-card-section>
         </q-card>
       </div>
-      <div class="col-6 q-px-md">
+      <div class="col-8 q-px-md">
         <q-card flat class="q-pa-md" style="height: 620px">
           <q-card-section>
             <div class="text-h6">
@@ -90,7 +90,12 @@
               <q-btn label="Crear Categoría" color="primary" :icon="'add'" />
             </div>
             <div class="q-mt-lg" style="max-height: 26rem; overflow-y: scroll">
-              <q-card flat bordered v-for="item in itemsFilered" :key="item.value">
+              <q-card
+                flat
+                bordered
+                v-for="item in itemsFilered"
+                :key="item.value"
+              >
                 <q-card-section>
                   <div class="row justify-between">
                     <div class="text-h6">{{ item.label }}</div>
@@ -117,7 +122,6 @@
                     <q-card-section>
                       <div class="row justify-between">
                         <div>
-                          <!-- <q-icon name="chevron_right" /> -->
                           <span>{{ subItem?.label }}</span>
                         </div>
                         <q-btn
@@ -185,7 +189,9 @@ const formProductoDefault = reactive({
 //buscador de categorias
 const itemsFilered = computed(() => {
   if (search.value.length > 0) {
-    return items.value.filter(item => item.label.toLowerCase().includes(search.value.toLowerCase()))
+    return items.value.filter(item =>
+      item.label.toLowerCase().includes(search.value.toLowerCase())
+    )
   }
   return items.value
 })

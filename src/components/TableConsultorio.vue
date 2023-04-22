@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { IClinic } from '../interfaces/Clinic'
+import { clinicDataServices } from 'src/services/ClinicDataService'
 const columns = [
   {
     name: 'name',
@@ -17,24 +19,28 @@ const columns = [
   { name: 'accion', label: 'Acción', align: 'center' }
 ]
 
-const consultorios = ref([
-  {
-    name: 'Escazú',
-    address:
-      'Centro Médico Momentum , enfrente de Multiplaza Escazú. Piso 7 , consultorio 72.',
-    contact: '2253-3773'
-  },
-  {
-    name: 'Calle Blancos',
-    address:
-      'Centro Médico Momentum , enfrente de Multiplaza Escazú. Piso 7 , consultorio 72.',
-    contact: '2253-3773'
-  }
-])
-
+const items = ref<IClinic[]>([])
 const prompt = ref(false)
-
 const address = ref('')
+const loading = ref(false)
+
+onMounted(async () => {
+  await getItems()
+})
+
+const getItems = async () => {
+  loading.value = true
+  try {
+    const data = await clinicDataServices.getClinics()
+
+    if (data.code === 200) {
+      items.value = data.data
+    }
+  } catch (error) {
+    console.log(error)
+  }
+  loading.value = false
+}
 </script>
 
 <template>
@@ -51,12 +57,15 @@ const address = ref('')
 
   <div class="q-mt-lg">
     <q-table
-      :rows="consultorios"
+      :rows="items"
       :columns="columns"
       row-key="name"
       :hide-pagination="true"
       table-header-class="bg-black text-white"
-
+      :loading="loading"
+      no-data-label="No se han encontrado registros"
+      rows-per-page-label="Filas por página"
+      :rows-per-page-options="[5, 10, 15]"
     >
       <template v-slot:body-cell-accion="props">
         <q-td :props="props">
@@ -108,8 +117,13 @@ const address = ref('')
       </q-card-section>
 
       <q-card-actions align="right" class="text-primary q-mr-md">
-        <q-btn outline label="Cancelar" v-close-popup style="width: 175px"/>
-        <q-btn color="primary" label="Añadir consultorio" v-close-popup style="width: 175px"/>
+        <q-btn outline label="Cancelar" v-close-popup style="width: 175px" />
+        <q-btn
+          color="primary"
+          label="Añadir consultorio"
+          v-close-popup
+          style="width: 175px"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>

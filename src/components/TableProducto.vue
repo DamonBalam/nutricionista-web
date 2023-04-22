@@ -36,7 +36,7 @@ const columns = [
 
 const search = ref('')
 const loading = ref(false)
-const items: IProducto[] = ref([])
+const items = ref<IProducto[]>([])
 
 onMounted(async () => {
   await getItems()
@@ -45,8 +45,8 @@ onMounted(async () => {
 const getItems = async () => {
   loading.value = true
   try {
-    const { data } = await productoDataServices.getProductos()
-    console.log(data)
+    const data = await productoDataServices.getProductos()
+
     if (data.code === 200) {
       items.value = data.data
     }
@@ -99,8 +99,7 @@ const itemsFiltered = computed(() => {
       row-key="name"
       table-header-class="bg-black text-white"
       :loading="loading"
-      no-data-label="I didn't find anything for you"
-      no-results-label="The filter didn't uncover any results"
+      no-data-label="No se han encontrado registros"
       rows-per-page-label="Filas por página"
       :rows-per-page-options="[10, 15, 30, 50]"
     >
@@ -111,7 +110,7 @@ const itemsFiltered = computed(() => {
           </div>
         </q-td>
       </template>
-      <template v-slot:loading>
+      <!-- <template v-slot:loading>
         <q-inner-loading showing color="primary" />
       </template>
       <template v-slot:no-data="{ icon, message, filter }">
@@ -120,7 +119,7 @@ const itemsFiltered = computed(() => {
           <span> No data </span>
           <q-icon size="2em" :name="filter ? 'filter_b_and_w' : icon" />
         </div>
-      </template>
+      </template> -->
     </q-table>
   </div>
 </template>

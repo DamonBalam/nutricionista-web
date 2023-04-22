@@ -12,8 +12,8 @@ const { login } = store
 const myForm = ref(null)
 const isPwd = ref(true)
 const usuario = ref('admin@gmail.com')
-const password = ref('admin09')
-const message = ref('')
+const password = ref('admin01')
+const message = ref<string>('')
 const accept = ref(false)
 const disabled = ref(false)
 
@@ -23,18 +23,20 @@ const messageError = computed(() => {
 
 async function handleSubmit () {
   disabled.value = true
+  message.value = ''
+  //@ts-ignore
   myForm.value.validate().then(async success => {
     if (success) {
       try {
-        const { data } = await authDataServices.login(
+        const { code, data, msg } = await authDataServices.login(
           usuario.value,
           password.value
         )
 
-        if (data.code === 200) {
-          login(data.data)
+        if (code === 200) {
+          login(data)
         } else {
-          message.value = data.msg
+          message.value = msg || 'Error al iniciar sesión'
         }
       } catch (error) {
         console.log(error)
@@ -110,7 +112,12 @@ async function handleSubmit () {
         </q-input>
 
         <div v-if="messageError">
-          <span class="text-red">{{ messageError }}</span>
+          <q-banner
+            inline-actions
+            class="text-white bg-red text-bold text-center"
+          >
+            {{ messageError }}
+          </q-banner>
         </div>
 
         <div class="row justify-between items-center q-mt-lg">

@@ -7,18 +7,18 @@ const route = 'categoria'
 class CategoryDataService {
   async getCategories (): Promise<IResponse<ICategory[]>> {
     let response = await API.get('show/categorias', {})
-    return response
+    return response.data
   }
 
   async getSubCategoriesByCategoryId (
     id: number
-  ): Promise<IResponse<ICategory[]>> {
+  ): Promise<IResponse<ICategory>> {
     let response = await API.get('show/categoria/{{id}}/subcategorias', {
       params: {
         id
       }
     })
-    return response
+    return response.data
   }
 }
 

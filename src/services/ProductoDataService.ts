@@ -7,7 +7,7 @@ const route = 'producto'
 class ProductoDataService {
   async getProductos (): Promise<IResponse<IProducto[]>> {
     let response = await API.get('show/productos', {})
-    return response
+    return response.data
   }
 }
 

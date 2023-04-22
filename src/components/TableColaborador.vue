@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { INutri } from '../interfaces/Nutri'
+import { nutriDataServices } from '../services/NutriDataService'
 const columns = [
   {
     name: 'name',
@@ -17,22 +19,27 @@ const columns = [
   { name: 'accion', label: 'Acción', align: 'center' }
 ]
 
-const colabs = [
-  {
-    name: 'Natalia Segura',
-    email: 'natalia@nutriocionista.com',
-    rol: 'Manager'
-  },
-  {
-    name: 'Rebeca Segura',
-    email: 'rebeca@nutriocionista.com',
-    rol: 'Admin'
-  }
-]
-
+const items = ref<INutri[]>([])
 const prompt = ref(false)
-
 const address = ref('')
+const loading = ref(false)
+
+onMounted(async () => {
+  await getItems()
+})
+
+const getItems = async () => {
+  loading.value = true
+  try {
+    const data = await nutriDataServices.getNutriologas()
+    if (data.code === 200) {
+      items.value = data.data
+    }
+  } catch (error) {
+    console.log(error)
+  }
+  loading.value = false
+}
 </script>
 
 <template>
@@ -49,12 +56,15 @@ const address = ref('')
 
   <div class="q-mt-lg">
     <q-table
-      :rows="colabs"
+      :rows="items"
       :columns="columns"
       row-key="name"
       :hide-pagination="true"
       table-header-class="bg-black text-white"
-
+      :loading="loading"
+      no-data-label="No se han encontrado registros"
+      rows-per-page-label="Filas por página"
+      :rows-per-page-options="[5, 10, 15]"
     >
       <template v-slot:body-cell-accion="props">
         <q-td :props="props">
@@ -65,6 +75,7 @@ const address = ref('')
       </template>
     </q-table>
   </div>
+
   <q-dialog v-model="prompt" persistent>
     <q-card style="min-width: 775px; border-radius: 40px" class="q-pa-lg">
       <q-card-section>
@@ -105,8 +116,13 @@ const address = ref('')
       </q-card-section>
 
       <q-card-actions align="right" class="text-primary q-mr-md">
-        <q-btn outline label="Cancelar" v-close-popup style="width: 175px"/>
-        <q-btn color="primary" label="Añadir consultorio" v-close-popup style="width: 175px"/>
+        <q-btn outline label="Cancelar" v-close-popup style="width: 175px" />
+        <q-btn
+          color="primary"
+          label="Añadir consultorio"
+          v-close-popup
+          style="width: 175px"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>

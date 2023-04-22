@@ -94,7 +94,7 @@
                 flat
                 bordered
                 v-for="item in itemsFiltered"
-                :key="item.value"
+                :key="item.id"
               >
                 <q-card-section>
                   <div class="row justify-between">
@@ -129,7 +129,7 @@
                           :label="
                             subcategory === subItem
                               ? 'Subcategoria Seleccionada'
-                              : 'Seleccionar'
+                              : 'Seleccionar subcategoria'
                           "
                           :color="subcategory !== subItem ? 'black' : 'primary'"
                           :outline="subcategory !== subItem"
@@ -165,10 +165,10 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from '@vue/reactivity'
+import { reactive, ref, computed, onMounted } from 'vue'
 import BotonBack from '../../components/common/BotonBack.vue'
-import { reactive, ref, onMounted } from 'vue'
 import { ICategory } from '../../interfaces/Category'
+import { ISubcategory } from '../../interfaces/Subcategory'
 import { categoryDataServices } from '../../services/CategoryDataService'
 
 const search = ref('')
@@ -189,9 +189,8 @@ const formProductoDefault = reactive({
 })
 
 //buscador de categorias
-
-const items: ICategory[] = ref([])
-const itemsSub: ISubcategory[] = ref([])
+const items = ref<ICategory[]>([])
+const itemsSub = ref<ISubcategory[]>([])
 
 function selectedCategory(item: any) {
   if (category.value === item) {
@@ -226,8 +225,7 @@ onMounted(async () => {
 const getItems = async () => {
   // loading.value = true
   try {
-    const { data } = await categoryDataServices.getCategories()
-    console.log(data)
+    const data = await categoryDataServices.getCategories()
     if (data.code === 200) {
       items.value = data.data
     }
@@ -240,10 +238,10 @@ const getSubcategories = async (id: number) => {
   // loading.value = true
   itemsSub.value = []
   try {
-    const { data } = await categoryDataServices.getSubCategoriesByCategoryId(id)
-    console.log(data)
-    if (data.code === 200) {
-      itemsSub.value = data.data.subcategorias
+    const res = await categoryDataServices.getSubCategoriesByCategoryId(id)
+
+    if (res.code === 200) {
+      itemsSub.value = res.data.subcategorias || []
     }
   } catch (error) {
     console.log(error)

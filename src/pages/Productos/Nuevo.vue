@@ -93,12 +93,12 @@
               <q-card
                 flat
                 bordered
-                v-for="item in itemsFilered"
+                v-for="item in itemsFiltered"
                 :key="item.value"
               >
                 <q-card-section>
                   <div class="row justify-between">
-                    <div class="text-h6">{{ item.label }}</div>
+                    <div class="text-h6">{{ item.nombre }}</div>
                     <q-btn
                       :label="
                         category === item
@@ -116,13 +116,13 @@
                   <q-card
                     flat
                     bordered
-                    v-for="subItem in item.children"
-                    :key="subItem.value"
+                    v-for="subItem in itemsSub"
+                    :key="subItem.id"
                   >
                     <q-card-section>
                       <div class="row justify-between">
                         <div>
-                          <span>{{ subItem?.label }}</span>
+                          <span>{{ subItem?.nombre }}</span>
                         </div>
                         <q-btn
                           unelevated
@@ -167,7 +167,9 @@
 <script lang="ts" setup>
 import { computed } from '@vue/reactivity'
 import BotonBack from '../../components/common/BotonBack.vue'
-import { reactive, ref } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
+import { ICategory } from '../../interfaces/Category'
+import { categoryDataServices } from '../../services/CategoryDataService'
 
 const search = ref('')
 const category = ref(null)
@@ -187,161 +189,9 @@ const formProductoDefault = reactive({
 })
 
 //buscador de categorias
-const itemsFilered = computed(() => {
-  if (search.value.length > 0) {
-    return items.value.filter(item =>
-      item.label.toLowerCase().includes(search.value.toLowerCase())
-    )
-  }
-  return items.value
-})
 
-const items = ref([
-  {
-    label: 'Categoría 1',
-    value: '1',
-    children: [
-      {
-        label: 'Subcategoria 1',
-        value: '1'
-      },
-      {
-        label: 'Subcategoria 2',
-        value: '2'
-      },
-      {
-        label: 'Subcategoria 3',
-        value: '3'
-      }
-    ]
-  },
-  {
-    label: 'Categoría 2',
-    value: '2',
-    children: [
-      {
-        label: 'Subcategoria 1',
-        value: '1'
-      },
-      {
-        label: 'Subcategoria 2',
-        value: '2'
-      },
-      {
-        label: 'Subcategoria 3',
-        value: '3'
-      }
-    ]
-  },
-  {
-    label: 'Categoría 3',
-    value: '3',
-    children: [
-      {
-        label: 'Subcategoria 1',
-        value: '1'
-      },
-      {
-        label: 'Subcategoria 2',
-        value: '2'
-      },
-      {
-        label: 'Subcategoria 3',
-        value: '3'
-      }
-    ]
-  },
-  {
-    label: 'Categoría 4',
-    value: '3',
-    children: [
-      {
-        label: 'Subcategoria 1',
-        value: '1'
-      },
-      {
-        label: 'Subcategoria 2',
-        value: '2'
-      },
-      {
-        label: 'Subcategoria 3',
-        value: '3'
-      }
-    ]
-  },
-  {
-    label: 'Categoría 5',
-    value: '3',
-    children: [
-      {
-        label: 'Subcategoria 1',
-        value: '1'
-      },
-      {
-        label: 'Subcategoria 2',
-        value: '2'
-      },
-      {
-        label: 'Subcategoria 3',
-        value: '3'
-      }
-    ]
-  },
-  {
-    label: 'Categoría 6',
-    value: '3',
-    children: [
-      {
-        label: 'Subcategoria 1',
-        value: '1'
-      },
-      {
-        label: 'Subcategoria 2',
-        value: '2'
-      },
-      {
-        label: 'Subcategoria 3',
-        value: '3'
-      }
-    ]
-  },
-  {
-    label: 'Categoría 7',
-    value: '3',
-    children: [
-      {
-        label: 'Subcategoria 1',
-        value: '1'
-      },
-      {
-        label: 'Subcategoria 2',
-        value: '2'
-      },
-      {
-        label: 'Subcategoria 3',
-        value: '3'
-      }
-    ]
-  },
-  {
-    label: 'Categoría 8',
-    value: '3',
-    children: [
-      {
-        label: 'Subcategoria 1',
-        value: '1'
-      },
-      {
-        label: 'Subcategoria 2',
-        value: '2'
-      },
-      {
-        label: 'Subcategoria 3',
-        value: '3'
-      }
-    ]
-  }
-])
+const items: ICategory[] = ref([])
+const itemsSub: ISubcategory[] = ref([])
 
 function selectedCategory(item: any) {
   if (category.value === item) {
@@ -349,6 +199,7 @@ function selectedCategory(item: any) {
     subcategory.value = null
   } else {
     category.value = item
+    getSubcategories(item.id)
   }
 }
 
@@ -367,6 +218,48 @@ function onSubmit() {
 function onReset() {
   console.log(formProducto)
 }
+
+onMounted(async () => {
+  await getItems()
+})
+
+const getItems = async () => {
+  // loading.value = true
+  try {
+    const { data } = await categoryDataServices.getCategories()
+    console.log(data)
+    if (data.code === 200) {
+      items.value = data.data
+    }
+  } catch (error) {
+    console.log(error)
+  }
+  // loading.value = false
+}
+const getSubcategories = async (id: number) => {
+  // loading.value = true
+  itemsSub.value = []
+  try {
+    const { data } = await categoryDataServices.getSubCategoriesByCategoryId(id)
+    console.log(data)
+    if (data.code === 200) {
+      itemsSub.value = data.data.subcategorias
+    }
+  } catch (error) {
+    console.log(error)
+  }
+  // loading.value = false
+}
+
+const itemsFiltered = computed(() => {
+  if (search.value === '') {
+    return items.value
+  }
+
+  return items.value.filter(item => {
+    return item.nombre.toLowerCase().includes(search.value.toLowerCase())
+  })
+})
 </script>
 
 <style lang="scss" scoped>

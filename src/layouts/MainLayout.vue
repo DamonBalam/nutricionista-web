@@ -32,7 +32,6 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
 import EssentialLink, { EssentialLinkProps } from 'components/EssentialLink.vue'
 import { useAuthStore } from 'stores/auth'
 

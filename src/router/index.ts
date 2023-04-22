@@ -1,4 +1,4 @@
-import { route, store } from 'quasar/wrappers'
+import { route } from 'quasar/wrappers'
 import { useAuthStore } from 'stores/auth'
 import { LocalStorage } from 'quasar'
 import { createRouter, createWebHistory } from 'vue-router'

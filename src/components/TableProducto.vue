@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { IProducto } from '../interfaces/Producto'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { productoDataServices } from '../services/ProductoDataService'
+import { computed } from '@vue/reactivity'
 
 const router = useRouter()
 const columns = [
@@ -33,7 +35,36 @@ const columns = [
 ]
 
 const search = ref('')
-const items: IProducto[] = []
+const loading = ref(false)
+const items: IProducto[] = ref([])
+
+onMounted(async () => {
+  await getItems()
+})
+
+const getItems = async () => {
+  loading.value = true
+  try {
+    const { data } = await productoDataServices.getProductos()
+    console.log(data)
+    if (data.code === 200) {
+      items.value = data.data
+    }
+  } catch (error) {
+    console.log(error)
+  }
+  loading.value = false
+}
+
+const itemsFiltered = computed(() => {
+  if (search.value === '') {
+    return items.value
+  }
+
+  return items.value.filter(item => {
+    return item.nombre.toLowerCase().includes(search.value.toLowerCase())
+  })
+})
 </script>
 <template>
   <div class="q-mt-lg q-pt-lg row justify-between">
@@ -45,7 +76,7 @@ const items: IProducto[] = []
         v-model="search"
         outlined
         dense
-        label="Buscar categoría"
+        label="Buscar producto"
         bg-color="white"
         style="width: 250px"
       >
@@ -63,11 +94,15 @@ const items: IProducto[] = []
   </div>
   <div class="q-mt-lg">
     <q-table
-      :rows="items"
+      :rows="itemsFiltered"
       :columns="columns"
       row-key="name"
-      :hide-pagination="true"
       table-header-class="bg-black text-white"
+      :loading="loading"
+      no-data-label="I didn't find anything for you"
+      no-results-label="The filter didn't uncover any results"
+      rows-per-page-label="Filas por página"
+      :rows-per-page-options="[10, 15, 30, 50]"
     >
       <template v-slot:body-cell-accion="props">
         <q-td :props="props">
@@ -75,6 +110,16 @@ const items: IProducto[] = []
             <q-btn flat round color="black" icon="more_vert" />
           </div>
         </q-td>
+      </template>
+      <template v-slot:loading>
+        <q-inner-loading showing color="primary" />
+      </template>
+      <template v-slot:no-data="{ icon, message, filter }">
+        <div class="full-width row flex-center text-primary q-gutter-sm">
+          <q-icon size="2em" name="sentiment_dissatisfied" />
+          <span> No data </span>
+          <q-icon size="2em" :name="filter ? 'filter_b_and_w' : icon" />
+        </div>
       </template>
     </q-table>
   </div>

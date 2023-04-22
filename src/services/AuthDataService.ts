@@ -11,7 +11,7 @@ class AuthDataService {
       }
     })
 
-    return response.data
+    return response
   }
 
   async logout (): Promise<IResponse<null>> {

@@ -22,18 +22,10 @@ export const useAuthStore = defineStore('auth', {
       LocalStorage.set('user', JSON.stringify(payload.user))
       LocalStorage.set('access_token', payload.token)
     },
-    async login (payload: any) {
-      try {
-        const res = await authDataServices.login(
-          payload.email,
-          payload.password
-        )
-        this.setUser(res.data)
-        this.setLocalStorage(res.data)
-        this.router.push('/inicio')
-      } catch (error) {
-        console.log(error)
-      }
+    login (payload: any) {
+      this.setUser(payload)
+      this.setLocalStorage(payload)
+      this.router.push('/inicio')
     },
     async logout () {
       try {

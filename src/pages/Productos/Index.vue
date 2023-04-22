@@ -8,6 +8,11 @@
 <script setup lang="ts">
 import Notification from '../../components/Notification.vue'
 import TableProducto from '../../components/TableProducto.vue'
+
+
+
+
+
 </script>
 <style scoped lang="scss">
 .fondo-gris {

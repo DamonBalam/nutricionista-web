@@ -262,6 +262,6 @@ const itemsFiltered = computed(() => {
 
 <style lang="scss" scoped>
 .fondo-gris {
-  background-color: #eeeeee;
+  background-color: #F1F5F9;
 }
 </style>

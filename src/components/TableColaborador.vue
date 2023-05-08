@@ -23,9 +23,20 @@ const items = ref<INutri[]>([])
 const prompt = ref(false)
 const address = ref('')
 const loading = ref(false)
-
+const colabs = [
+  {
+    name: 'Natalia Segura',
+    email: 'natalia@nutriocionista.com',
+    rol: 'Manager'
+  },
+  {
+    name: 'Rebeca Segura',
+    email: 'rebeca@nutriocionista.com',
+    rol: 'Admin'
+  }
+]
 onMounted(async () => {
-  await getItems()
+  // await getItems()
 })
 
 const getItems = async () => {
@@ -44,7 +55,7 @@ const getItems = async () => {
 
 <template>
   <div class="q-mt-lg q-pt-lg row justify-between">
-    <span class="text-black text-bold text-h5">Colaboradores</span>
+    <span class="text-black text-bold text-h5">Nutricionistas</span>
     <q-btn
       label="Añadir Colaborador"
       type="submit"
@@ -56,11 +67,13 @@ const getItems = async () => {
 
   <div class="q-mt-lg">
     <q-table
-      :rows="items"
+      flat
+      :rows="colabs"
       :columns="columns"
       row-key="name"
       :hide-pagination="true"
-      table-header-class="bg-black text-white"
+      table-header-class="bg-accent text-black border-accent text-weight-bold"
+      :separator="'cell'"
       :loading="loading"
       no-data-label="No se han encontrado registros"
       rows-per-page-label="Filas por página"
@@ -79,7 +92,7 @@ const getItems = async () => {
   <q-dialog v-model="prompt" persistent>
     <q-card style="min-width: 775px; border-radius: 40px" class="q-pa-lg">
       <q-card-section>
-        <div class="text-h6">Nuevo Colaborador</div>
+        <div class="text-h6">Nueva Nutricionista</div>
       </q-card-section>
 
       <q-card-section class="row">

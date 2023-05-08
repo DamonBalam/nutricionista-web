@@ -37,6 +37,7 @@ const meta = ref<Meta>({
 </script>
 <style scoped lang="scss">
 .fondo-gris {
-  background-color: #EEEEEE;
+  // background-color: #EEEEEE;
+  background: #F1F5F9;
 }
 </style>

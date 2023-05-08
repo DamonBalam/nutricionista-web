@@ -7,6 +7,13 @@ class NutriDataService {
     let response = await API.get('show/nutricionistas', {})
     return response.data
   }
+
+  async saveNutricionista (data: INutri): Promise<IResponse<INutri>> {
+    let response = await API.post('create/nutricionista', {
+      data: data
+    })
+    return response.data
+  }
 }
 
 export const nutriDataServices = new NutriDataService()

@@ -4,7 +4,7 @@ import Axios, { AxiosRequestConfig } from 'axios'
 // Incluimos la instancia Vuex
 
 //Incluimos interceptores
-// import {setupInterceptorsTo} from '@/common/interceptors';
+// import {setupInterceptorsTo} from '../interceptors';
 
 /**
  * Este método reemplaza los parámetros contenido en la URL en formato <code>{{nombreParametro}}</code>

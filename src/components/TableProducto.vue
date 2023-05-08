@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { IProducto } from '../interfaces/Producto'
-import { ref, onMounted } from 'vue'
 import { productoDataServices } from '../services/ProductoDataService'
+import { ref, onMounted } from 'vue'
 import { computed } from '@vue/reactivity'
 
 const router = useRouter()
@@ -94,10 +94,12 @@ const itemsFiltered = computed(() => {
   </div>
   <div class="q-mt-lg">
     <q-table
+      flat
       :rows="itemsFiltered"
       :columns="columns"
       row-key="name"
-      table-header-class="bg-black text-white"
+      table-header-class="bg-accent text-black border-accent text-weight-bold"
+      :separator="'cell'"
       :loading="loading"
       no-data-label="No se han encontrado registros"
       rows-per-page-label="Filas por página"

@@ -1,10 +1,10 @@
 <template>
   <div>
     <q-btn
-      size="lg"
+      size="md"
       flat
       color="primary"
-      label="Regresar"
+      label="Atrás"
       icon="chevron_left"
       :to="url"
     />

@@ -23,7 +23,20 @@ const items = ref<IClinic[]>([])
 const prompt = ref(false)
 const address = ref('')
 const loading = ref(false)
-
+const consultorios = ref([
+  {
+    name: 'Escazú',
+    address:
+      'Centro Médico Momentum , enfrente de Multiplaza Escazú. Piso 7 , consultorio 72.',
+    contact: '2253-3773'
+  },
+  {
+    name: 'Calle Blancos',
+    address:
+      'Centro Médico Momentum , enfrente de Multiplaza Escazú. Piso 7 , consultorio 72.',
+    contact: '2253-3773'
+  }
+])
 onMounted(async () => {
   await getItems()
 })
@@ -57,11 +70,13 @@ const getItems = async () => {
 
   <div class="q-mt-lg">
     <q-table
-      :rows="items"
+      :rows="consultorios"
+      flat
       :columns="columns"
       row-key="name"
       :hide-pagination="true"
-      table-header-class="bg-black text-white"
+      table-header-class="bg-accent text-black border-accent text-weight-bold"
+      :separator="'cell'"
       :loading="loading"
       no-data-label="No se han encontrado registros"
       rows-per-page-label="Filas por página"

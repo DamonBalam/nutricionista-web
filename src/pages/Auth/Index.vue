@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useAuthStore } from 'stores/auth'
 import { authDataServices } from '../../services/AuthDataService'
-import { computed } from '@vue/reactivity'
-import { useRouter } from 'vue-router'
+
 
 const store = useAuthStore()
-const router = useRouter()
 const { login } = store
 
 const myForm = ref(null)
 const isPwd = ref(true)
-const usuario = ref('admin@gmail.com')
-const password = ref('admin01')
+const usuario = ref('')
+const password = ref('')
 const message = ref<string>('')
 const accept = ref(false)
 const disabled = ref(false)

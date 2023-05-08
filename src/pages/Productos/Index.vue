@@ -16,6 +16,6 @@ import TableProducto from '../../components/TableProducto.vue'
 </script>
 <style scoped lang="scss">
 .fondo-gris {
-  background-color: #eeeeee;
+  background-color: #F1F5F9;
 }
 </style>

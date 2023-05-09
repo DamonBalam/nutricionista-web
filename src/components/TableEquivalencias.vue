@@ -57,6 +57,7 @@ const columns = [
 const loading = ref(false)
 const cita_control_id = ref<string | number | null>(null)
 const equivalencia_id = ref<string | number | null>(null)
+const fecha = ref<string | number | null>(null)
 
 watch(
   () => props.cita,
@@ -117,56 +118,6 @@ const items = ref<any[]>([
     proteinas: ''
   }
 ])
-const itemsDefault = [
-  {
-    tiempo: 'Desayuno',
-    carbohidratos: '',
-    frutas: '',
-    vegetales: '',
-    lacteos: '',
-    proteinas: ''
-  },
-  {
-    tiempo: 'Media Mañana',
-    carbohidratos: '',
-    frutas: '',
-    vegetales: '',
-    lacteos: '',
-    proteinas: ''
-  },
-  {
-    tiempo: 'Almuerzo',
-    carbohidratos: '',
-    frutas: '',
-    vegetales: '',
-    lacteos: '',
-    proteinas: ''
-  },
-  {
-    tiempo: 'Media Tarde',
-    carbohidratos: '',
-    frutas: '',
-    vegetales: '',
-    lacteos: '',
-    proteinas: ''
-  },
-  {
-    tiempo: 'Cena',
-    carbohidratos: '',
-    frutas: '',
-    vegetales: '',
-    lacteos: '',
-    proteinas: ''
-  },
-  {
-    tiempo: 'Merienda Noche',
-    carbohidratos: '',
-    frutas: '',
-    vegetales: '',
-    lacteos: '',
-    proteinas: ''
-  }
-]
 
 onMounted(async () => {
   const data = await citaControlDataServices.getAll(props.id)
@@ -185,6 +136,7 @@ const getItems = async () => {
     )
 
     if (data.code === 200) {
+      fecha.value = data.data.cita_control.fecha_cita
       equivalencia_id.value = data.data.equivalencias_nutricionales[0].id
 
       const desayuno = JSON.parse(
@@ -243,6 +195,7 @@ const getItems = async () => {
       items.value[5].proteinas = merienda_noche.proteinas
     } else {
       equivalencia_id.value = null
+      fecha.value = null
       items.value[0].carbohidratos = ''
       items.value[0].frutas = ''
       items.value[0].vegetales = ''
@@ -352,7 +305,7 @@ const submit = async () => {
 
     if (equivalencia_id.value === null) {
       const res = await eqNuDataService.save(data)
-      if (res.code === 200) {
+      if (res.code === 201) {
         await getItems()
       }
     } else {
@@ -369,7 +322,8 @@ const submit = async () => {
 <template>
   <div class="q-mt-md">
     <span class="text-black text-bold text-h5"
-      >Equivalencias nutricionales</span
+      >Equivalencias nutricionales
+      {{ fecha === null ? '' : ` - ${fecha}` }}</span
     >
   </div>
   <div class="q-mt-md">

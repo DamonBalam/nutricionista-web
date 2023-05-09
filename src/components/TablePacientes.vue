@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue'
 import { computed } from '@vue/reactivity'
 import { IPaciente } from '../interfaces/Paciente'
+import { pacienteDataServices } from 'src/services/PacienteDataService'
 
 const router = useRouter()
 const columns = [
@@ -14,15 +15,15 @@ const columns = [
   },
 
   {
-    name: 'fecha',
+    name: 'cita',
     label: 'Fecha ultima cita',
-    field: 'fecha',
+    field: 'cita',
     align: 'center'
   },
   {
-    name: 'acceso',
+    name: 'suscripcion',
     label: 'Acceso',
-    field: 'acceso',
+    field: 'suscripcion',
     align: 'center'
   },
   {
@@ -66,93 +67,56 @@ const options = [
 ]
 
 const loading = ref(false)
-const items = ref<any[]>([
-  {
-    id: 1,
-    nombre: 'Juan Perez',
-    fecha: '12/12/2021',
-    consultorio: '1',
-    nutricionista: '1',
-    telefono: '1234567890',
-    email: 'correo@gmail.com',
-    acceso: true
-  },
-  {
-    id: 2,
-    nombre: 'Pedro Perez',
-    nutricionista: '1',
-    fecha: '12/12/2021',
-    consultorio: '1',
-    telefono: '1234567890',
-    email: 'correo@gmail.com',
-    acceso: false
-  },
-  {
-    id: 3,
-    nombre: 'Arturo Saldivar',
-    nutricionista: '1',
-    fecha: '12/12/2021',
-    consultorio: '2',
-    telefono: '1234567890',
-    email: 'correo@gmail.com',
-    acceso: false
-  },
-  {
-    id: 4,
-    nombre: 'Gerardo Jimenez',
-    nutricionista: '1',
-    fecha: '12/12/2021',
-    consultorio: '2',
-    telefono: '1234567890',
-    email: 'correo@gmail.com',
-    acceso: true
-  }
-])
+const items = ref<any[]>([])
 
 onMounted(async () => {
-  // await getItems()
+  await getItems()
 })
 
-// const getItems = async () => {
-//   loading.value = true
-//   try {
-//     const data = await productoDataServices.getProductos()
+const getItems = async () => {
+  loading.value = true
+  try {
+    const data = await pacienteDataServices.getAll()
 
-//     if (data.code === 200) {
-//       items.value = data.data
-//     }
-//   } catch (error) {
-//     console.log(error)
-//   }
-//   loading.value = false
-// }
+    if (data.code === 200) {
+      items.value = data.data
+      // console.log(data.data)
+    }
+  } catch (error) {
+    console.log(error)
+  }
+  loading.value = false
+}
+const fechaActual = computed(() => {
+  const fechaActual = new Date().toISOString().substr(0, 10)
+  return fechaActual
+})
 
-// const itemsFiltered = computed(() => {
-//   if (search.value === '') {
-//     return items.value
-//   }
+function isFechaEnRango(fechaInicio: string, fechaFin: string) {
+  return fechaActual.value >= fechaInicio && fechaActual.value <= fechaFin
+}
+// const pacientesFiltered = computed(() => {
+//   return items.value.filter((item: IPaciente) => {
+//     const coincideNombre =
+//       search.value === '' ||
+//       item.nombre.toLocaleLowerCase().includes(search.value.toLocaleLowerCase())
+//     const coincideAcceso = acceso.value === null || item.acceso === acceso.value
+//     const coincideConsultorio =
+//       consultorio.value === '' || item.consultorio === consultorio.value
+//     const coincideFecha = fecha.value === '' || item.fecha === fecha.value
+//     // const coincideColaborador = colaborador.value === null || item.colaborador === colaborador.value
 
-//   return items.value.filter(item => {
-//     return item.nombre.toLowerCase().includes(search.value.toLowerCase())
+//     return (
+//       coincideNombre && coincideAcceso && coincideConsultorio && coincideFecha
+//     )
 //   })
 // })
 
-const pacientesFiltered = computed(() => {
-  return items.value.filter((item: IPaciente) => {
-    const coincideNombre =
-      search.value === '' ||
-      item.nombre.toLocaleLowerCase().includes(search.value.toLocaleLowerCase())
-    const coincideAcceso = acceso.value === null || item.acceso === acceso.value
-    const coincideConsultorio =
-      consultorio.value === '' || item.consultorio === consultorio.value
-    const coincideFecha = fecha.value === '' || item.fecha === fecha.value
-    // const coincideColaborador = colaborador.value === null || item.colaborador === colaborador.value
+const getPerfil = (id: string) => {
+  console.log(id)
 
-    return (
-      coincideNombre && coincideAcceso && coincideConsultorio && coincideFecha
-    )
-  })
-})
+  router.push({ name: 'PerfilPaciente', params: { id } })
+}
 </script>
 <template>
   <div class="q-mt-lg q-pt-lg">
@@ -240,7 +204,7 @@ const pacientesFiltered = computed(() => {
   <div class="q-mt-lg">
     <q-table
       flat
-      :rows="pacientesFiltered"
+      :rows="items"
       :columns="columns"
       row-key="name"
       table-header-class="bg-accent text-black border-accent text-weight-bold"
@@ -250,23 +214,62 @@ const pacientesFiltered = computed(() => {
       rows-per-page-label="Filas por página"
       :rows-per-page-options="[10, 15, 30, 50]"
     >
-      <template v-slot:body-cell-acceso="props">
-        <q-td key="acceso" :props="props">
+      <template v-slot:body-cell-cita="props">
+        <q-td key="cita" :props="props">
+          {{
+            props.row.cita.fecha !== null
+              ? props.row.cita.fecha
+              : 'No hay registro'
+          }}
+        </q-td>
+      </template>
+      <template v-slot:body-cell-suscripcion="props">
+        <q-td key="suscripcion" :props="props">
           <q-chip
-            :color="props.row.acceso ? 'primary' : 'negative'"
+            :color="
+              isFechaEnRango(
+                props.row.suscripcion.empieza,
+                props.row.suscripcion.termina
+              )
+                ? 'primary'
+                : 'negative'
+            "
             text-color="white"
             size="md"
             class="q-pa-md"
           >
-            {{ props.row.acceso ? 'Con acceso' : 'Sin acceso' }}
+            {{
+              isFechaEnRango(
+                props.row.suscripcion.empieza,
+                props.row.suscripcion.termina
+              )
+                ? 'Con acceso'
+                : 'Sin acceso'
+            }}
           </q-chip>
         </q-td>
       </template>
       <template v-slot:body-cell-accion="props">
         <q-td :props="props">
-          <div>
-            <q-btn flat round color="black" icon="more_vert" />
-          </div>
+          <q-btn flat round color="black" icon="more_vert">
+            <q-menu>
+              <q-list style="min-width: 100px">
+                <q-item
+                  clickable
+                  v-close-popup
+                  @click="getPerfil(props.row.id)"
+                >
+                  <q-item-section>Perfil</q-item-section>
+                </q-item>
+                <q-item clickable v-close-popup>
+                  <q-item-section>Editar</q-item-section>
+                </q-item>
+                <!-- <q-item clickable v-close-popup>
+                    <q-item-section>New incognito tab</q-item-section>
+                  </q-item> -->
+              </q-list>
+            </q-menu>
+          </q-btn>
         </q-td>
       </template>
     </q-table>

@@ -4,7 +4,7 @@
     <div class="q-mx-md q-mt-md">
       <span class="text-black text-bold text-h5">Resumen del paciente</span>
     </div>
-    <div class="row q-mx-md q-mt-lg">
+    <div class="row q-mx-md q-mt-sm">
       <div class="col-12 q-mb-xs">
         <q-card flat bordered class="row" style="height: 250px">
           <q-card-section class="col-3" style="border-right: 1px solid #e2e8f0">
@@ -13,20 +13,24 @@
                 <img src="../../assets/images.png" />
               </q-avatar>
               <span class="text-weight-bold q-mt-xs" style="font-size: 20px">{{
-                paciente.nombre
+                paciente.nombre +
+                ' ' +
+                paciente.apellido_paterno +
+                ' ' +
+                paciente.apellido_materno
               }}</span>
-              <span style="font-size: 12px; color: #94a3b8">{{
+              <span style="font-size: 12px; font-weight: 700; color: #94a3b8">{{
                 paciente.telefono
               }}</span>
-              <span style="font-size: 12px; color: #94a3b8">{{
+              <span style="font-size: 12px; font-weight: 700; color: #94a3b8">{{
                 paciente.email
               }}</span>
               <q-toggle
-                v-model="paciente.acceso"
+                v-model="getAcceso"
+                disable
                 checked-icon="check"
                 color="primary"
-                :label="paciente.acceso ? 'Acceso' : 'Sin acceso'"
-                unchecked-icon="clear"
+                :label="getAcceso ? 'Acceso' : 'Sin acceso'"
                 size="xl"
               />
             </div>
@@ -36,7 +40,7 @@
             style="border-right: 1px solid #e2e8f0"
           >
             <p class="text-weight-bold q-mt-md">Datos generales</p>
-            <div class="row justify-between q-mb-sm" style="width: 180px">
+            <div class="row justify-between q-mb-sm" style="width: 230px">
               <span class="text-weight-bold" style="font-size: 16px">Sexo</span>
               <span
                 class="text-weight-bold"
@@ -44,30 +48,32 @@
                 >{{ paciente.sexo == 'M' ? 'Hombre' : 'Mujer' }}</span
               >
             </div>
-            <div class="row justify-between q-mb-sm" style="width: 180px">
+            <div class="row justify-between q-mb-sm" style="width: 230px">
               <span class="text-weight-bold" style="font-size: 16px">Edad</span>
               <span
                 class="text-weight-bold"
                 style="font-size: 16px; color: #94a3b8"
-                >{{ '64 años' }}</span
+                >{{ getEdad }}</span
               >
             </div>
-            <div class="row justify-between q-mb-sm" style="width: 180px">
+            <div class="row justify-between q-mb-sm" style="width: 230px">
               <span class="text-weight-bold" style="font-size: 16px"
-                >Estatura</span
+                >Consultorio</span
               >
               <span
                 class="text-weight-bold"
                 style="font-size: 16px; color: #94a3b8"
-                >{{ '184 cms' }}</span
+                >{{ paciente.consultorio }}</span
               >
             </div>
-            <div class="row justify-between q-mb-sm" style="width: 180px">
-              <span class="text-weight-bold" style="font-size: 16px">Peso</span>
+            <div class="row justify-between q-mb-sm" style="width: 230px">
+              <span class="text-weight-bold" style="font-size: 16px"
+                >Nutricionista</span
+              >
               <span
                 class="text-weight-bold"
                 style="font-size: 16px; color: #94a3b8"
-                >{{ '1.88 kgs' }}</span
+                >{{ paciente.nutricionista }}</span
               >
             </div>
           </q-card-section>
@@ -75,12 +81,7 @@
           <q-card-section class="col-4 q-pl-xl">
             <div class="row justify-between items-center q-mt-md q-mb-md">
               <p class="text-weight-bold q-mb-none">Datos Adicionales</p>
-              <q-btn
-                color="primary"
-                label="Editar"
-                flat
-                text-color="primary"
-              />
+              <q-btn color="primary" label="Editar" flat text-color="primary" />
             </div>
             <div class="row justify-between q-mb-sm" style="">
               <span class="text-weight-bold" style="font-size: 16px"
@@ -89,7 +90,11 @@
               <span
                 class="text-weight-bold"
                 style="font-size: 16px; color: #94a3b8"
-                >{{ '[Condición médica]' }}</span
+                >{{
+                  paciente.condiciones_medicas
+                    ? paciente.condiciones_medicas
+                    : 'Ninguna'
+                }}</span
               >
             </div>
             <div class="row justify-between q-mb-sm" style="">
@@ -99,7 +104,7 @@
               <span
                 class="text-weight-bold"
                 style="font-size: 16px; color: #94a3b8"
-                >{{ 'Cada 3 días' }}</span
+                >{{ paciente.actividad_fisica?.nombre }}</span
               >
             </div>
             <div class="row justify-between q-mb-sm" style="">
@@ -109,7 +114,7 @@
               <span
                 class="text-weight-bold"
                 style="font-size: 16px; color: #94a3b8"
-                >{{ '[Alergias]' }}</span
+                >{{ paciente.alergias ? paciente.alergias : 'Ninguna' }}</span
               >
             </div>
             <div class="row justify-between q-mb-sm" style="">
@@ -119,14 +124,14 @@
               <span
                 class="text-weight-bold"
                 style="font-size: 16px; color: #94a3b8"
-                >{{ 'Perder peso' }}</span
+                >{{ paciente.objetivo?.nombre }}</span
               >
             </div>
           </q-card-section>
         </q-card>
       </div>
       <div class="col-12">
-        <TableCitas />
+        <TableCitas :id="paciente.id"/>
       </div>
       <div class="col-12 q-mb-md">
         <TableEquivalencias />
@@ -136,10 +141,12 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import BotonBack from '../../components/common/BotonBack.vue'
 import TableCitas from '../../components/TableCitas.vue'
 import TableEquivalencias from '../../components/TableEquivalencias.vue'
+import { Paciente, IPaciente } from '../../interfaces/Paciente'
+import { pacienteDataServices } from '../../services/PacienteDataService'
 
 const props = defineProps({
   id: {
@@ -148,22 +155,51 @@ const props = defineProps({
   }
 })
 
-const paciente = reactive({
-  nombre: 'Angel Arturo',
-  apellido: 'Saldivar',
-  segundoApellido: 'Balam',
-  fechaNacimiento: '04/05/1995',
-  sexo: 'M',
-  telefono: '9831820506',
-  email: 'damonbalam@gmail.com',
-  alergias: ['Polen', 'Polvo', 'Cacahuate'],
-  antecedentes: ['Diabetes', 'Hipertensión', 'Colesterol'],
-  actividadFisica: '2 veces por semana',
-  objetivoActual: 'Estar en forma',
-  consultorio: '1',
-  nutricionista: 'Nutriologo 1',
-  acceso: true
+const paciente = ref(new Paciente({} as IPaciente))
+
+onMounted(async () => {
+  let res = await pacienteDataServices.getById(props.id)
+
+  if (res.code == 200) {
+    paciente.value = res.data.user
+  }
 })
+
+function calcularEdad(fechaNacimiento: any) {
+  var fechaActual = new Date()
+  var edad = fechaActual.getFullYear() - fechaNacimiento.getFullYear()
+
+  // Verificar si aún no ha cumplido años en este año
+  if (
+    fechaActual.getMonth() < fechaNacimiento.getMonth() ||
+    (fechaActual.getMonth() === fechaNacimiento.getMonth() &&
+      fechaActual.getDate() < fechaNacimiento.getDate())
+  ) {
+    edad--
+  }
+
+  return edad
+}
+
+const getEdad = computed(() => {
+  const fechaNacimiento = new Date(paciente.value.fecha_nacimiento)
+
+  return calcularEdad(fechaNacimiento)
+})
+
+const getAcceso = computed(() => {
+  const fechaActual = new Date().toISOString().substr(0, 10)
+
+  return isFechaEnRango(
+    fechaActual,
+    paciente.value.suscripcion?.empieza,
+    paciente.value.suscripcion?.termina
+  )
+})
+
+function isFechaEnRango(fecha: any, fechaInicio: any, fechaFin: any) {
+  return fecha >= fechaInicio && fecha <= fechaFin
+}
 </script>
 
 <style lang="scss" scoped>

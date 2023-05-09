@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive, computed } from 'vue'
 import { INutri } from '../interfaces/Nutri'
 import { nutriDataServices } from '../services/NutriDataService'
+import { roleDataServices } from '../services/RoleDataService'
+import { IRole } from '../interfaces/Role'
 const columns = [
   {
-    name: 'name',
+    name: 'nombre',
     label: 'Nombre',
-    field: 'name',
+    field: 'nombre',
     align: 'left'
   },
   {
@@ -18,10 +20,15 @@ const columns = [
   { name: 'rol', label: 'Rol', field: 'rol', align: 'center' },
   { name: 'accion', label: 'Acción', align: 'center' }
 ]
-
+const myForm = ref<HTMLFormElement | null>(null)
 const items = ref<INutri[]>([])
 const prompt = ref(false)
-const address = ref('')
+const form = reactive({
+  id: null,
+  nombre: '',
+  email: '',
+  rol: null
+})
 const loading = ref(false)
 const colabs = [
   {
@@ -35,9 +42,33 @@ const colabs = [
     rol: 'Admin'
   }
 ]
-onMounted(async () => {
-  // await getItems()
+
+const roles = ref<IRole[]>([])
+
+const rolesComputed = computed(() => {
+  return roles.value.map(role => {
+    return {
+      label: role.name,
+      value: role.id
+    }
+  })
 })
+
+onMounted(async () => {
+  await getItems()
+  await getRoles()
+})
+
+const getRoles = async () => {
+  try {
+    const data = await roleDataServices.getAll()
+    if (data.code === 200) {
+      roles.value = data.data
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 const getItems = async () => {
   loading.value = true
@@ -51,38 +82,92 @@ const getItems = async () => {
   }
   loading.value = false
 }
+
+const submit = async () => {
+  if (myForm.value?.validate()) {
+    try {
+      if (form.id === null) {
+        const data = await nutriDataServices.saveNutricionista({
+          nombre: form.nombre,
+          email: form.email,
+          rol: form.rol.name
+        })
+        if (data.code === 200) {
+          await getItems()
+          closeModal()
+        }
+      } else {
+        const data = await nutriDataServices.updateNutricionista(form.id, {
+          nombre: form.nombre,
+          email: form.email,
+          rol: form.rol.name
+        })
+        if (data.code === 200) {
+          await getItems()
+          closeModal()
+        }
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+}
+
+const closeModal = () => {
+  prompt.value = false
+  form.id = null
+  form.nombre = ''
+  form.email = ''
+  form.rol = null
+}
+
+const handleEdit = (data: any) => {
+  console.log(data.row)
+  form.id = data.row.id
+  form.nombre = data.row.nombre
+  form.email = data.row.email
+  form.rol = data.row.rol
+  prompt.value = true
+}
 </script>
 
 <template>
   <div class="q-mt-lg q-pt-lg row justify-between">
     <span class="text-black text-bold text-h5">Nutricionistas</span>
-    <q-btn
-      label="Añadir Colaborador"
-      type="submit"
-      color="primary"
-      :icon="'add'"
-      @click="prompt = true"
-    />
+    <q-btn type="submit" color="primary" :icon="'add'" @click="prompt = true"
+      >Añadir Nutricionista</q-btn
+    >
   </div>
 
   <div class="q-mt-lg">
     <q-table
       flat
-      :rows="colabs"
+      :rows="items"
       :columns="columns"
       row-key="name"
-      :hide-pagination="true"
+      :hide-pagination="false"
       table-header-class="bg-accent text-black border-accent text-weight-bold"
       :separator="'cell'"
       :loading="loading"
       no-data-label="No se han encontrado registros"
       rows-per-page-label="Filas por página"
-      :rows-per-page-options="[5, 10, 15]"
+      :rows-per-page-options="[3, 5, 10]"
     >
       <template v-slot:body-cell-accion="props">
         <q-td :props="props">
           <div>
-            <q-btn flat round color="black" icon="more_vert" />
+            <q-btn flat round color="black" icon="more_vert">
+              <q-menu>
+                <q-list style="min-width: 100px">
+                  <q-item clickable v-close-popup @click="handleEdit(props)">
+                    <q-item-section>Editar</q-item-section>
+                  </q-item>
+                  <!-- <q-item clickable v-close-popup>
+                    <q-item-section>New incognito tab</q-item-section>
+                  </q-item> -->
+                </q-list>
+              </q-menu>
+            </q-btn>
           </div>
         </q-td>
       </template>
@@ -92,49 +177,71 @@ const getItems = async () => {
   <q-dialog v-model="prompt" persistent>
     <q-card style="min-width: 775px; border-radius: 40px" class="q-pa-lg">
       <q-card-section>
-        <div class="text-h6">Nueva Nutricionista</div>
+        <div class="text-h6">
+          {{
+            form.id === null
+              ? 'Nueva Nutricionista'
+              : 'Actualizar Nutricionista'
+          }}
+        </div>
       </q-card-section>
 
-      <q-card-section class="row">
-        <div class="col q-mx-xs">
-          <q-input
-            outlined
-            label="Nombre"
-            dense
-            v-model="address"
-            autofocus
-            @keyup.enter="prompt = false"
-          />
-        </div>
-        <div class="col q-mx-xs">
-          <q-input
-            outlined
-            label="E-mail"
-            dense
-            v-model="address"
-            autofocus
-            @keyup.enter="prompt = false"
-          />
-        </div>
-        <div class="col q-mx-xs">
-          <q-input
-            outlined
-            label="Rol"
-            dense
-            v-model="address"
-            autofocus
-            @keyup.enter="prompt = false"
-          />
-        </div>
-      </q-card-section>
+      <q-form ref="myForm">
+        <q-card-section class="row q-col-gutter-sm">
+          <div class="col-4">
+            <q-input
+              outlined
+              placeholder="Nombre"
+              dense
+              v-model="form.nombre"
+              autofocus
+              lazy-rules
+              :rules="[val => !!val || 'El nombre es requerido']"
+            />
+          </div>
+          <div class="col-4">
+            <q-input
+              outlined
+              type="email"
+              placeholder="Correo electrónico"
+              dense
+              v-model="form.email"
+              lazy-rules
+              :rules="[
+                val => !!val || 'El email es requerido',
+                val => /.+@.+/.test(val) || 'El email debe ser válido'
+              ]"
+            />
+          </div>
+          <div class="col-4">
+            <q-select
+              outlined
+              label="Rol"
+              :options="roles"
+              option-value="item.id"
+              option-label="name"
+              dense
+              v-model="form.rol"
+              lazy-rules
+              :rules="[val => !!val || 'El rol es requerido']"
+            />
+          </div>
+        </q-card-section>
+      </q-form>
 
       <q-card-actions align="right" class="text-primary q-mr-md">
-        <q-btn outline label="Cancelar" v-close-popup style="width: 175px" />
+        <q-btn
+          outline
+          label="Cancelar"
+          @click="closeModal"
+          style="width: 175px"
+        />
         <q-btn
           color="primary"
-          label="Añadir consultorio"
+          :label="form.id === null ? 'Guardar' : 'Actualizar'"
           v-close-popup
           style="width: 175px"
+          @click="submit"
         />
       </q-card-actions>
     </q-card>

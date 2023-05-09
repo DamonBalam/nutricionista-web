@@ -4,6 +4,7 @@ import { IProducto } from '../interfaces/Producto'
 import { productoDataServices } from '../services/ProductoDataService'
 import { ref, onMounted } from 'vue'
 import { computed } from '@vue/reactivity'
+import { E } from 'app/dist/spa/assets/index.0a47eace'
 
 const router = useRouter()
 const columns = [
@@ -60,47 +61,65 @@ const columns = [
 
 const search = ref('')
 const loading = ref(false)
+
+
+
+
 const items = ref<any[]>([
   {
     alimentos: 'Carbohidratos',
-    desayuno: '2',
-    media_manana: '1',
-    almuerzo: '1',
-    media_tarde: '1',
-    cena: '1',
-    media_noche: '1',
-    total: '7'
+    desayuno: '',
+    media_manana: '',
+    almuerzo: '',
+    media_tarde: '',
+    cena: '',
+    media_noche: '',
   },
   {
     alimentos: 'Frutas',
-    desayuno: '2',
-    media_manana: '1',
-    almuerzo: '1',
-    media_tarde: '1',
-    cena: '1',
-    media_noche: '1',
-    total: '7'
+    desayuno: '',
+    media_manana: '',
+    almuerzo: '',
+    media_tarde: '',
+    cena: '',
+    media_noche: '',
   },
   {
     alimentos: 'Vegetales',
-    desayuno: '2',
-    media_manana: '1',
-    almuerzo: '1',
-    media_tarde: '1',
-    cena: '1',
-    media_noche: '1',
-    total: '7'
+    desayuno: '',
+    media_manana: '',
+    almuerzo: '',
+    media_tarde: '',
+    cena: '',
+    media_noche: '',
   },
   {
     alimentos: 'Lácteos',
-    desayuno: '2',
-    media_manana: '1',
-    almuerzo: '1',
-    media_tarde: '1',
-    cena: '1',
-    media_noche: '1',
-    total: '7'
+    desayuno: '',
+    media_manana: '',
+    almuerzo: '',
+    media_tarde: '',
+    cena: '',
+    media_noche: '',
   },
+  {
+    alimentos: 'Proteínas',
+    desayuno: '',
+    media_manana: '',
+    almuerzo: '',
+    media_tarde: '',
+    cena: '',
+    media_noche: '',
+  },
+  {
+    alimentos: 'Grasas',
+    desayuno: '',
+    media_manana: '',
+    almuerzo: '',
+    media_tarde: '',
+    cena: '',
+    media_noche: '',
+  }
 ])
 
 onMounted(async () => {
@@ -132,13 +151,12 @@ const itemsFiltered = computed(() => {
 })
 </script>
 <template>
-  <div class="q-mt-lg q-pt-lg row justify-between">
+  <div class="q-mt-md">
     <span class="text-black text-bold text-h5"
       >Equivalencias nutricionales</span
     >
-    <q-btn label="Nuevo registro" color="primary" :icon="'add'" />
   </div>
-  <div class="q-mt-lg">
+  <div class="q-mt-md">
     <q-table
       flat
       :rows="itemsFiltered"
@@ -150,6 +168,95 @@ const itemsFiltered = computed(() => {
       no-data-label="No se han encontrado registros"
       hide-pagination
     >
+      <template v-slot:body="props">
+        <q-tr :props="props">
+          <q-td key="alimentos" :props="props">{{ props.row.alimentos }}</q-td>
+          <q-td key="desayuno" :props="props">
+            {{ props.row.desayuno }}
+            <q-popup-edit v-model="props.row.desayuno" v-slot="scope">
+              <q-input
+                v-model="scope.value"
+                dense
+                autofocus
+                counter
+                @keyup.enter="scope.set"
+              />
+            </q-popup-edit>
+          </q-td>
+          <q-td key="media_manana" :props="props">
+            {{ props.row.media_manana }}
+            <q-popup-edit v-model="props.row.media_manana" v-slot="scope">
+              <q-input
+                v-model="scope.value"
+                dense
+                autofocus
+                counter
+                @keyup.enter="scope.set"
+              />
+            </q-popup-edit>
+          </q-td>
+          <q-td key="almuerzo" :props="props">
+            {{ props.row.almuerzo }}
+            <q-popup-edit v-model="props.row.almuerzo" v-slot="scope">
+              <q-input
+                v-model="scope.value"
+                dense
+                autofocus
+                counter
+                @keyup.enter="scope.set"
+              />
+            </q-popup-edit>
+          </q-td>
+
+          <q-td key="media_tarde" :props="props">
+            {{ props.row.media_tarde }}
+            <q-popup-edit v-model="props.row.media_tarde" v-slot="scope">
+              <q-input
+                v-model="scope.value"
+                dense
+                autofocus
+                counter
+                @keyup.enter="scope.set"
+              />
+            </q-popup-edit>
+          </q-td>
+          <q-td key="cena" :props="props">
+            {{ props.row.cena }}
+            <q-popup-edit v-model="props.row.cena" v-slot="scope">
+              <q-input
+                v-model="scope.value"
+                dense
+                autofocus
+                counter
+                @keyup.enter="scope.set"
+              />
+            </q-popup-edit>
+          </q-td>
+          <q-td key="media_noche" :props="props">
+            {{ props.row.media_noche }}
+            <q-popup-edit v-model="props.row.media_noche" v-slot="scope">
+              <q-input
+                v-model="scope.value"
+                dense
+                autofocus
+                counter
+                @keyup.enter="scope.set"
+              />
+            </q-popup-edit>
+          </q-td>
+          <q-td key="total" :props="props">{{
+            Number(props.row.desayuno) +
+            Number(props.row.media_manana) +
+            Number(props.row.almuerzo) +
+            Number(props.row.media_tarde) +
+            Number(props.row.cena) +
+            Number(props.row.media_noche)
+          }}</q-td>
+        </q-tr>
+      </template>
     </q-table>
+  </div>
+  <div class="row justify-end q-mt-md">
+    <q-btn color="primary">Guardar</q-btn>
   </div>
 </template>

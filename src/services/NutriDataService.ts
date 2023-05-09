@@ -14,6 +14,15 @@ class NutriDataService {
     })
     return response.data
   }
+  async updateNutricionista (
+    id: number,
+    data: INutri
+  ): Promise<IResponse<INutri>> {
+    let response = await API.post(`update/nutricionista/${id}`, {
+      data: data
+    })
+    return response.data
+  }
 }
 
 export const nutriDataServices = new NutriDataService()

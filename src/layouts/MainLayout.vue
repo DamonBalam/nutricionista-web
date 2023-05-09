@@ -34,6 +34,7 @@
 <script setup lang="ts">
 import EssentialLink, { EssentialLinkProps } from 'components/EssentialLink.vue'
 import { useAuthStore } from 'stores/auth'
+import { onMounted, ref } from 'vue'
 
 const store = useAuthStore()
 const { logout } = store
@@ -60,7 +61,12 @@ const essentialLinks: EssentialLinkProps[] = [
   }
 ]
 
-const leftDrawerOpen = true
+const leftDrawerOpen = ref(true)
+
+onMounted(() => {
+  leftDrawerOpen.value = true
+  // await getItems()
+})
 function handleSubmit() {
   logout()
 }

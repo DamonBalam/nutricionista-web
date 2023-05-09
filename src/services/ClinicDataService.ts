@@ -14,6 +14,12 @@ class ClinicDataService {
     })
     return response.data
   }
+  async updateClinic (id: number, clinic: IClinic): Promise<IResponse<IClinic>> {
+    let response = await API.post(`update/consultorio/${id}`, {
+      data: clinic
+    })
+    return response.data
+  }
 }
 
 export const clinicDataServices = new ClinicDataService()

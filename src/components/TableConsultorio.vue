@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import { IClinic } from '../interfaces/Clinic'
 import { clinicDataServices } from 'src/services/ClinicDataService'
 const columns = [
@@ -15,28 +15,22 @@ const columns = [
     label: 'Dirección',
     field: 'address'
   },
-  { name: 'contact', label: 'Contacto', field: 'contact', align: 'center' },
+  { name: 'telefono', label: 'Contacto', field: 'phone', align: 'center' },
   { name: 'accion', label: 'Acción', align: 'center' }
 ]
 
+const myForm = ref<HTMLFormElement | null>(null)
+
 const items = ref<IClinic[]>([])
 const prompt = ref(false)
-const address = ref('')
+const form = reactive({
+  id: null,
+  nombre: '',
+  direccion: '',
+  telefono: ''
+})
 const loading = ref(false)
-const consultorios = ref([
-  {
-    name: 'Escazú',
-    address:
-      'Centro Médico Momentum , enfrente de Multiplaza Escazú. Piso 7 , consultorio 72.',
-    contact: '2253-3773'
-  },
-  {
-    name: 'Calle Blancos',
-    address:
-      'Centro Médico Momentum , enfrente de Multiplaza Escazú. Piso 7 , consultorio 72.',
-    contact: '2253-3773'
-  }
-])
+
 onMounted(async () => {
   await getItems()
 })
@@ -54,6 +48,52 @@ const getItems = async () => {
   }
   loading.value = false
 }
+const submit = async () => {
+  if (myForm.value?.validate()) {
+    try {
+      if (form.id === null) {
+        const data = await clinicDataServices.saveClinic({
+          nombre: form.nombre,
+          direccion: form.direccion,
+          telefono: form.telefono
+        })
+        if (data.code === 200) {
+          await getItems()
+          closeModal()
+        }
+      } else {
+        const data = await clinicDataServices.updateClinic(form.id, {
+          nombre: form.nombre,
+          direccion: form.direccion,
+          telefono: form.telefono
+        })
+        if (data.code === 200) {
+          await getItems()
+          closeModal()
+        }
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+}
+
+const closeModal = () => {
+  prompt.value = false
+  form.id = null
+  form.nombre = ''
+  form.telefono = ''
+  form.direccion = ''
+}
+
+const handleEdit = (data: any) => {
+  console.log(data.row)
+  form.id = data.row.id
+  form.nombre = data.row.name
+  form.telefono = data.row.phone
+  form.direccion = data.row.address
+  prompt.value = true
+}
 </script>
 
 <template>
@@ -70,22 +110,34 @@ const getItems = async () => {
 
   <div class="q-mt-lg">
     <q-table
-      :rows="consultorios"
+      :rows="items"
       flat
       :columns="columns"
       row-key="name"
-      :hide-pagination="true"
+      :hide-pagination="false"
       table-header-class="bg-accent text-black border-accent text-weight-bold"
       :separator="'cell'"
       :loading="loading"
       no-data-label="No se han encontrado registros"
       rows-per-page-label="Filas por página"
-      :rows-per-page-options="[5, 10, 15]"
+      :rows-per-page-options="[3, 5, 10]"
     >
       <template v-slot:body-cell-accion="props">
         <q-td :props="props">
           <div>
-            <q-btn flat round color="black" icon="more_vert" />
+            <!-- <q-btn flat round color="black" icon="more_vert" /> -->
+            <q-btn flat round color="black" icon="more_vert">
+              <q-menu>
+                <q-list style="min-width: 100px">
+                  <q-item clickable v-close-popup @click="handleEdit(props)">
+                    <q-item-section>Editar</q-item-section>
+                  </q-item>
+                  <!-- <q-item clickable v-close-popup>
+                    <q-item-section>New incognito tab</q-item-section>
+                  </q-item> -->
+                </q-list>
+              </q-menu>
+            </q-btn>
           </div>
         </q-td>
       </template>
@@ -95,48 +147,62 @@ const getItems = async () => {
   <q-dialog v-model="prompt" persistent>
     <q-card style="min-width: 775px; border-radius: 40px" class="q-pa-lg">
       <q-card-section>
-        <div class="text-h6">Nuevo Consultorio</div>
+        <div class="text-h6">
+          {{
+            form.id === null ? 'Nuevo Consultorio' : 'Actualizar Consultorio'
+          }}
+        </div>
       </q-card-section>
 
-      <q-card-section class="row">
-        <div class="col q-mx-xs">
-          <q-input
-            outlined
-            label="Ubicación"
-            dense
-            v-model="address"
-            autofocus
-            @keyup.enter="prompt = false"
-          />
-        </div>
-        <div class="col q-mx-xs">
-          <q-input
-            outlined
-            label="Dirección"
-            dense
-            v-model="address"
-            autofocus
-            @keyup.enter="prompt = false"
-          />
-        </div>
-        <div class="col q-mx-xs">
-          <q-input
-            outlined
-            label="Contacto"
-            dense
-            v-model="address"
-            autofocus
-            @keyup.enter="prompt = false"
-          />
-        </div>
-      </q-card-section>
+      <q-form ref="myForm">
+        <q-card-section class="row q-col-gutter-sm">
+          <div class="col-4">
+            <q-input
+              outlined
+              label="Ubicación"
+              dense
+              v-model="form.nombre"
+              autofocus
+              lazy-rules
+              :rules="[val => !!val || 'Este campo es requerido']"
+            />
+          </div>
+          <div class="col-4">
+            <q-input
+              outlined
+              label="Dirección"
+              dense
+              v-model="form.direccion"
+              autofocus
+              lazy-rules
+              :rules="[val => !!val || 'Este campo es requerido']"
+            />
+          </div>
+          <div class="col-4">
+            <q-input
+              outlined
+              label="Teléfono"
+              dense
+              v-model="form.telefono"
+              autofocus
+              lazy-rules
+              :rules="[val => !!val || 'Este campo es requerido']"
+            />
+          </div>
+        </q-card-section>
+      </q-form>
 
       <q-card-actions align="right" class="text-primary q-mr-md">
-        <q-btn outline label="Cancelar" v-close-popup style="width: 175px" />
+        <q-btn
+          outline
+          label="Cancelar"
+          @click="closeModal"
+          style="width: 175px"
+        />
         <q-btn
           color="primary"
-          label="Añadir consultorio"
-          v-close-popup
+          :label="form.id === null ? 'Guardar' : 'Actualizar'"
+          @click="submit"
           style="width: 175px"
         />
       </q-card-actions>

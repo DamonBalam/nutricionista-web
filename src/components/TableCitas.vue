@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { IProducto } from '../interfaces/Producto'
-import { productoDataServices } from '../services/ProductoDataService'
 import { ref, onMounted, reactive } from 'vue'
-import { computed } from '@vue/reactivity'
 import { citaControlDataServices } from '../services/CitaControlDataService'
+import { ICitaControl } from '../interfaces/CitaControl'
 
 const props = defineProps({
   id: {
@@ -12,54 +11,56 @@ const props = defineProps({
   }
 })
 
+const emits = defineEmits(['cita'])
+
 const columns = [
   {
-    name: 'fecha',
+    name: 'fecha_cita',
     label: 'Fecha',
-    field: 'fecha',
-    align: 'left'
+    field: 'fecha_cita',
+    align: 'center'
   },
   {
     name: 'peso',
     label: 'Peso',
     field: 'peso',
-    align: 'left'
+    align: 'center'
   },
   {
     name: 'musculo',
     label: 'Músculo',
     field: 'musculo',
-    align: 'left'
+    align: 'center'
   },
   {
     name: 'grasas',
     label: 'Grasas',
     field: 'grasas',
-    align: 'left'
+    align: 'center'
   },
   {
     name: 'porcentaje_grasa',
     label: '% de Grasa',
     field: 'porcentaje_grasa',
-    align: 'left'
+    align: 'center'
   },
   {
     name: 'cc',
     label: 'CC',
     field: 'cc',
-    align: 'left'
+    align: 'center'
   },
   {
-    name: 'grasa_visceral',
-    label: 'Grasas',
-    field: 'grasa_visceral',
-    align: 'left'
+    name: 'grasa_viceral',
+    label: 'Grasa visceral',
+    field: 'grasa_viceral',
+    align: 'center'
   },
   {
     name: 'evolucion',
     label: 'Evolución',
     field: 'evolucion',
-    align: 'left'
+    align: 'center'
   }
 ]
 
@@ -67,7 +68,7 @@ const search = ref('')
 const prompt = ref(false)
 const myForm = ref<HTMLFormElement | null>(null)
 const loading = ref(false)
-const items = ref<IProducto[]>([])
+const items = ref<ICitaControl[]>([])
 
 const form = reactive({
   id: null,
@@ -80,17 +81,17 @@ const form = reactive({
   evolucion: ''
 })
 
-onMounted(async () => {
-  // await getItems()
+onMounted(() => {
+  getItems()
 })
 
 const getItems = async () => {
   loading.value = true
   try {
-    const data = await productoDataServices.getProductos()
+    const data = await citaControlDataServices.getAll(props.id)
 
     if (data.code === 200) {
-      items.value = data.data
+      items.value = data.data.reverse()
     }
   } catch (error) {
     console.log(error)
@@ -144,6 +145,10 @@ const closeModal = () => {
   form.grasa_viceral = ''
   form.evolucion = ''
 }
+
+const handleCita = (id: number) => {
+  emits('cita', id)
+}
 </script>
 <template>
   <div class="q-mt-sm row justify-between items-center">
@@ -152,6 +157,7 @@ const closeModal = () => {
   </div>
   <div class="q-mt-sm">
     <q-table
+      dense
       flat
       :rows="items"
       :columns="columns"
@@ -163,6 +169,21 @@ const closeModal = () => {
       rows-per-page-label="Filas por página"
       :rows-per-page-options="[3, 5, 10]"
     >
+      <template v-slot:body-cell-fecha_cita="props">
+        <q-td key="fecha_cita" :props="props" auto-width>
+          <!-- {{ props.row.cita.fecha }} -->
+          <q-btn
+            rounded
+            flat
+            size="sm"
+            class="bg-primary"
+            text-color="white"
+            @click="handleCita(props.row.id)"
+          >
+            {{ props.row.fecha_cita }}
+          </q-btn>
+        </q-td>
+      </template>
     </q-table>
   </div>
   <q-dialog v-model="prompt" persistent>
@@ -273,3 +294,8 @@ const closeModal = () => {
     </q-card>
   </q-dialog>
 </template>
+<style scoped lang="scss">
+.altura {
+  height: 10px !important;
+}
+</style>

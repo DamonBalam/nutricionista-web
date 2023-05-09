@@ -1,7 +1,6 @@
 import { API } from 'src/common/api'
 import { ICitaControl } from 'src/interfaces/CitaControl'
 import { IResponse } from 'src/interfaces/Response'
-import { IRole } from 'src/interfaces/Role'
 
 class CitaControlDataService {
   async getAll (id: string): Promise<IResponse<ICitaControl[]>> {

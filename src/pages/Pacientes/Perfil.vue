@@ -6,7 +6,7 @@
     </div>
     <div class="row q-mx-md q-mt-sm">
       <div class="col-12 q-mb-xs">
-        <q-card flat bordered class="row" style="height: 250px">
+        <q-card flat bordered class="row" style="height: 240px">
           <q-card-section class="col-3" style="border-right: 1px solid #e2e8f0">
             <div class="column items-center justify-center">
               <q-avatar size="80px" class="q-mt-sm">
@@ -131,10 +131,10 @@
         </q-card>
       </div>
       <div class="col-12">
-        <TableCitas :id="paciente.id"/>
+        <TableCitas :id="id" @cita="handleCita" />
       </div>
-      <div class="col-12 q-mb-md">
-        <TableEquivalencias />
+      <div class="col-12 q-mb-xs">
+        <TableEquivalencias :id="id" :cita="idCita" />
       </div>
     </div>
   </q-page>
@@ -151,11 +151,16 @@ import { pacienteDataServices } from '../../services/PacienteDataService'
 const props = defineProps({
   id: {
     type: String,
-    default: ''
+    required: true
   }
 })
 
 const paciente = ref(new Paciente({} as IPaciente))
+const idCita = ref('')
+
+const handleCita = (id: string) => {
+  idCita.value = id
+}
 
 onMounted(async () => {
   let res = await pacienteDataServices.getById(props.id)
@@ -185,6 +190,10 @@ const getEdad = computed(() => {
   const fechaNacimiento = new Date(paciente.value.fecha_nacimiento)
 
   return calcularEdad(fechaNacimiento)
+})
+
+const getId = computed(() => {
+  return paciente.value.id
 })
 
 const getAcceso = computed(() => {

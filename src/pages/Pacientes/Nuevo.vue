@@ -371,7 +371,8 @@ import { objetivoDataServices } from 'src/services/ObjetivoDataService'
 import { pacienteDataServices } from '../../services/PacienteDataService'
 import { IPaciente } from '../../interfaces/Paciente'
 import { useRouter } from 'vue-router'
-
+import { useQuasar } from 'quasar'
+const $q = useQuasar()
 const router = useRouter()
 
 const myForm = ref<any>(null)
@@ -474,10 +475,24 @@ const submit = async () => {
       console.log(data)
 
       if (data.code === 200) {
+        $q.notify({
+          color: 'green-4',
+          textColor: 'white',
+          icon: 'check_circle',
+          message: 'Cliente agregado correctamente',
+          position: 'top-right'
+        })
         myForm.value?.resetValidation()
         router.push({ name: 'PerfilPaciente', params: { id: data.data.id } })
       }
     } catch (error) {
+      $q.notify({
+        color: 'red-4',
+        textColor: 'white',
+        icon: 'error',
+        message: 'Ocurrió un error',
+        position: 'top-right'
+      })
       console.log(error)
     }
   }

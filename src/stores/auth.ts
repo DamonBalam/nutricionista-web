@@ -5,15 +5,20 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     counter: 0,
     user: {},
-    token: ''
+    token: '',
+    initLoader: false
   }),
 
   getters: {
     isAuth: state => state.token !== '',
-    getUser: state => state.user
+    getUser: state => state.user,
+    getLoader: state => state.initLoader
   },
 
   actions: {
+    setLoader (payload: boolean) {
+      this.initLoader = payload
+    },
     setUser (payload: any) {
       this.user = payload.user
       this.token = payload.token

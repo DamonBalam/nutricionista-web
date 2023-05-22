@@ -173,7 +173,8 @@ import { ISubcategory } from '../../interfaces/Subcategory'
 import { categoryDataServices } from '../../services/CategoryDataService'
 import { productoDataServices } from '../../services/ProductoDataService'
 import { useRouter } from 'vue-router'
-
+import { useQuasar } from 'quasar'
+const $q = useQuasar()
 const router = useRouter()
 const search = ref('')
 const category = ref(null)
@@ -215,21 +216,36 @@ function selectedSubcategory(item: any) {
 }
 
 async function onSubmit() {
-  console.log(formProducto)
+  try {
+    const data = {
+      nombre: formProducto.nombre,
+      cantidad_producto: formProducto.cantidad_producto,
+      intercambio_nutricional: formProducto.intercambio_nutricional,
+      detalles_adicionales: formProducto.detalles_adicionales,
+      subcategoria_id: subcategory.value?.id
+    }
 
-  const data = {
-    nombre: formProducto.nombre,
-    cantidad_producto: formProducto.cantidad_producto,
-    intercambio_nutricional: formProducto.intercambio_nutricional,
-    detalles_adicionales: formProducto.detalles_adicionales,
-    subcategoria_id: subcategory.value?.id
-  }
+    const res = await productoDataServices.saveProducto(data)
 
-  const res = await productoDataServices.saveProducto(data)
-
-  if (res.code === 200) {
-    console.log('Producto creado')
-    router.push('/productos')
+    if (res.code === 200) {
+      $q.notify({
+        color: 'green-4',
+        textColor: 'white',
+        icon: 'check_circle',
+        message: 'Producto agregado correctamente',
+        position: 'top-right'
+      })
+      router.push('/productos')
+    }
+  } catch (error) {
+    $q.notify({
+      color: 'red-4',
+      textColor: 'white',
+      icon: 'error',
+      message: 'Ocurrió un error',
+      position: 'top-right'
+    })
+    console.log(error)
   }
 }
 

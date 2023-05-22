@@ -4,6 +4,8 @@ import { INutri } from '../interfaces/Nutri'
 import { nutriDataServices } from '../services/NutriDataService'
 import { roleDataServices } from '../services/RoleDataService'
 import { IRole } from '../interfaces/Role'
+import { useQuasar } from 'quasar'
+const $q = useQuasar()
 const columns = [
   {
     name: 'nombre',
@@ -93,6 +95,13 @@ const submit = async () => {
           rol: form.rol.name
         })
         if (data.code === 200) {
+          $q.notify({
+            color: 'green-4',
+            textColor: 'white',
+            icon: 'check_circle',
+            message: 'Nutricionista agregado correctamente',
+            position: 'top-right'
+          })
           await getItems()
           closeModal()
         }
@@ -103,11 +112,25 @@ const submit = async () => {
           rol: form.rol.name
         })
         if (data.code === 200) {
+          $q.notify({
+            color: 'green-4',
+            textColor: 'white',
+            icon: 'check_circle',
+            message: 'Nutricionista actualizado correctamente',
+            position: 'top-right'
+          })
           await getItems()
           closeModal()
         }
       }
     } catch (error) {
+      $q.notify({
+        color: 'red-4',
+        textColor: 'white',
+        icon: 'error',
+        message: 'Ocurrió un error',
+        position: 'top-right'
+      })
       console.log(error)
     }
   }
@@ -149,7 +172,6 @@ const handleEdit = (data: any) => {
       table-header-class="bg-accent text-black border-accent text-weight-bold"
       :separator="'cell'"
       :loading="loading"
-
       no-data-label="No se han encontrado registros"
       rows-per-page-label="Filas por página"
       :rows-per-page-options="[5]"

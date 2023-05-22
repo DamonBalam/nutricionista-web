@@ -2,7 +2,8 @@
 import { ref, computed } from 'vue'
 import { useAuthStore } from 'stores/auth'
 import { authDataServices } from '../../services/AuthDataService'
-
+import { useQuasar } from 'quasar'
+const $q = useQuasar()
 const store = useAuthStore()
 const { login } = store
 
@@ -40,11 +41,35 @@ async function handleSubmit () {
         )
 
         if (code === 200) {
+          $q.notify({
+            color: 'green-4',
+            textColor: 'white',
+            icon: 'check_circle',
+            message: 'Inicio sesión correctamente',
+            position: 'top-right'
+          })
           login(data)
         } else {
           message.value = msg || 'Error al iniciar sesión'
+          $q.notify({
+            color: 'red-4',
+            textColor: 'white',
+            icon: 'error',
+            message: 'Ocurrió un error',
+            position: 'top-right'
+          })
+          setTimeout(() => {
+            message.value = ''
+          }, 3000)
         }
       } catch (error) {
+        $q.notify({
+          color: 'red-4',
+          textColor: 'white',
+          icon: 'error',
+          message: 'Ocurrió un error',
+          position: 'top-right'
+        })
         console.log(error)
         // message.value = error.response.data.message
       }
@@ -64,13 +89,23 @@ async function handleRecoverySubmit () {
         const data = await authDataServices.recover(usuarioRecovery.value)
 
         if (data.data.code === 200) {
-          console.log('success')
-
+          $q.notify({
+            color: 'green-4',
+            textColor: 'white',
+            icon: 'check_circle',
+            message: 'Se ha enviado un correo electrónico',
+            position: 'top-right'
+          })
           messageRecovery.value =
             data.data.msg || 'Se ha enviado un correo electrónico'
         } else {
-          console.log('error')
-
+          $q.notify({
+            color: 'red-4',
+            textColor: 'white',
+            icon: 'error',
+            message: 'Ocurrió un error',
+            position: 'top-right'
+          })
           message.value =
             data.data.msg || 'Error al validar el correo electrónico'
 
@@ -80,6 +115,13 @@ async function handleRecoverySubmit () {
         }
       } catch (error) {
         console.log(error)
+        $q.notify({
+          color: 'red-4',
+          textColor: 'white',
+          icon: 'error',
+          message: 'Ocurrió un error',
+          position: 'top-right'
+        })
         // message.value = error.response.data.message
       }
     }
@@ -99,7 +141,10 @@ function handleClick () {
         <q-img src="../../assets/Logo.png" width="200px" />
       </div>
 
-      <div v-if="!showRecovery" class="row justify-center q-my-xs-none q-my-xl-xl">
+      <div
+        v-if="!showRecovery"
+        class="row justify-center q-my-xs-none q-my-xl-xl"
+      >
         <h3 class="text-primary text-bold">¡Bienvenida!</h3>
       </div>
 

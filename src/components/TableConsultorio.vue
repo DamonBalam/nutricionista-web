@@ -2,6 +2,8 @@
 import { ref, onMounted, reactive } from 'vue'
 import { IClinic } from '../interfaces/Clinic'
 import { clinicDataServices } from 'src/services/ClinicDataService'
+import { useQuasar } from 'quasar'
+const $q = useQuasar()
 const columns = [
   {
     name: 'name',
@@ -58,6 +60,12 @@ const submit = async () => {
           telefono: form.telefono
         })
         if (data.code === 200) {
+          $q.notify({
+            color: 'green-4',
+            textColor: 'white',
+            icon: 'check_circle',
+            message: 'Consultorio agregado correctamente'
+          })
           await getItems()
           closeModal()
         }
@@ -68,11 +76,25 @@ const submit = async () => {
           telefono: form.telefono
         })
         if (data.code === 200) {
+          $q.notify({
+            color: 'green-4',
+            textColor: 'white',
+            icon: 'check_circle',
+            message: 'Consultorio actualizado correctamente',
+            position: 'top-right'
+          })
           await getItems()
           closeModal()
         }
       }
     } catch (error) {
+      $q.notify({
+        color: 'red-4',
+        textColor: 'white',
+        icon: 'error',
+        message: 'Ocurrió un error',
+        position: 'top-right'
+      })
       console.log(error)
     }
   }

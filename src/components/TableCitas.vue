@@ -3,7 +3,8 @@ import { IProducto } from '../interfaces/Producto'
 import { ref, onMounted, reactive } from 'vue'
 import { citaControlDataServices } from '../services/CitaControlDataService'
 import { ICitaControl } from '../interfaces/CitaControl'
-
+import { useQuasar } from 'quasar'
+const $q = useQuasar()
 const props = defineProps({
   id: {
     type: String || Number,
@@ -114,6 +115,13 @@ const submit = async () => {
           cliente_id: props.id
         })
         if (data.code === 200) {
+          $q.notify({
+            color: 'green-4',
+            textColor: 'white',
+            icon: 'check_circle',
+            message: 'Cita agregada correctamente',
+            position: 'top-right'
+          })
           await getItems()
           closeModal()
         }
@@ -129,6 +137,13 @@ const submit = async () => {
         // }
       }
     } catch (error) {
+      $q.notify({
+        color: 'red-4',
+        textColor: 'white',
+        icon: 'error',
+        message: 'Ocurrió un error',
+        position: 'top-right'
+      })
       console.log(error)
     }
   }

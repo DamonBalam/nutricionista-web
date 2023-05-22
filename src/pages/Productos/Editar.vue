@@ -174,18 +174,12 @@ import { ISubcategory } from '../../interfaces/Subcategory'
 import { categoryDataServices } from '../../services/CategoryDataService'
 import { productoDataServices } from '../../services/ProductoDataService'
 import { useRouter } from 'vue-router'
-
+import { useQuasar } from 'quasar'
+const $q = useQuasar()
 const router = useRouter()
 const search = ref('')
 const category = ref(null)
 const subcategory = ref(null)
-
-const CategoryComputed = computed(() => {
-  return category.value
-})
-const SubcategoryComputed = computed(() => {
-  return subcategory.value
-})
 
 const props = defineProps({
   id: {
@@ -243,18 +237,37 @@ function selectedSubcategory(item: any) {
 }
 
 async function onSubmit() {
-  const data = {
-    nombre: formProducto.nombre,
-    cantidad_producto: formProducto.cantidad_producto,
-    intercambio_nutricional: formProducto.intercambio_nutricional,
-    detalles_adicionales: formProducto.detalles_adicionales,
-    subcategoria_id: subcategory.value?.id
-  }
+  try {
+    const data = {
+      nombre: formProducto.nombre,
+      cantidad_producto: formProducto.cantidad_producto,
+      intercambio_nutricional: formProducto.intercambio_nutricional,
+      detalles_adicionales: formProducto.detalles_adicionales,
+      subcategoria_id: subcategory.value?.id
+    }
 
-  const res = await productoDataServices.updateProducto(props.id, data)
+    const res = await productoDataServices.updateProducto(props.id, data)
 
-  if (res.code === 200) {
-    router.push('/productos')
+    if (res.code === 200) {
+      $q.notify({
+        color: 'green-4',
+        textColor: 'white',
+        icon: 'check_circle',
+        message: 'Producto actualizado correctamente',
+        position: 'top-right'
+      })
+      router.push('/productos')
+    }
+  } catch (error) {
+    $q.notify({
+      color: 'red-4',
+      textColor: 'white',
+      icon: 'error',
+      message: 'Ocurrió un error',
+      position: 'top-right'
+
+    })
+    console.log(error)
   }
 }
 

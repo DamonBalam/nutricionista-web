@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import { computed } from '@vue/reactivity'
 import { citaControlDataServices } from '../services/CitaControlDataService'
 import { eqNuDataService } from '../services/EqNuDataService'
-
+import { useQuasar } from 'quasar'
+const $q = useQuasar()
 const props = defineProps({
   id: {
     type: String || Number,
@@ -331,14 +331,35 @@ const submit = async () => {
       const res = await eqNuDataService.save(data)
       if (res.code === 201) {
         await getItems()
+        $q.notify({
+          color: 'green-4',
+          textColor: 'white',
+          icon: 'check_circle',
+          message: 'Equivalencia nutricional agregada correctamente',
+          position: 'top-right'
+        })
       }
     } else {
       const res = await eqNuDataService.update(equivalencia_id.value, data)
       if (res.code === 200) {
         await getItems()
+        $q.notify({
+          color: 'green-4',
+          textColor: 'white',
+          icon: 'check_circle',
+          message: 'Equivalencia nutricional actualizada correctamente',
+          position: 'top-right'
+        })
       }
     }
   } catch (error) {
+    $q.notify({
+      color: 'red-4',
+      textColor: 'white',
+      icon: 'error',
+      message: 'Ocurrió un error',
+      position: 'top-right'
+    })
     console.log(error)
   }
 }

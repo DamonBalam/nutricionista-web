@@ -65,6 +65,10 @@ const itemsFiltered = computed(() => {
     return item.nombre.toLowerCase().includes(search.value.toLowerCase())
   })
 })
+
+const getEditar = (id: string) => {
+  router.push({ name: 'EditarProducto', params: { id } })
+}
 </script>
 <template>
   <div class="q-mt-lg q-pt-lg row justify-between">
@@ -107,21 +111,21 @@ const itemsFiltered = computed(() => {
     >
       <template v-slot:body-cell-accion="props">
         <q-td :props="props">
-          <div>
-            <q-btn flat round color="black" icon="more_vert" />
-          </div>
+          <q-btn flat round color="black" icon="more_vert">
+            <q-menu>
+              <q-list style="min-width: 100px">
+                <q-item
+                  clickable
+                  v-close-popup
+                  @click="getEditar(props.row.id)"
+                >
+                  <q-item-section>Editar</q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-btn>
         </q-td>
       </template>
-      <!-- <template v-slot:loading>
-        <q-inner-loading showing color="primary" />
-      </template>
-      <template v-slot:no-data="{ icon, message, filter }">
-        <div class="full-width row flex-center text-primary q-gutter-sm">
-          <q-icon size="2em" name="sentiment_dissatisfied" />
-          <span> No data </span>
-          <q-icon size="2em" :name="filter ? 'filter_b_and_w' : icon" />
-        </div>
-      </template> -->
     </q-table>
   </div>
 </template>

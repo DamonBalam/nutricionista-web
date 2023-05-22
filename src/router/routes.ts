@@ -3,9 +3,15 @@ import { RouteRecordRaw } from 'vue-router'
 const routes: RouteRecordRaw[] = [
   {
     path: '/login',
-    name: 'Login',
+
     component: () => import('layouts/AuthLayout.vue'),
-    children: [{ path: '', component: () => import('pages/Auth/Index.vue') }]
+    children: [
+      {
+        path: '',
+        name: 'Login',
+        component: () => import('pages/Auth/Index.vue')
+      }
+    ]
   },
   {
     path: '/',
@@ -63,6 +69,15 @@ const routes: RouteRecordRaw[] = [
       {
         path: '/productos/nuevo',
         component: () => import('pages/Productos/Nuevo.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/productos/producto-editar/:id',
+        name: 'EditarProducto',
+        props: true,
+        component: () => import('pages/Productos/Editar.vue'),
         meta: {
           requiresAuth: true
         }

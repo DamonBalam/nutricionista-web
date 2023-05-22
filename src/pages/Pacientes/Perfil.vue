@@ -63,7 +63,7 @@
               <span
                 class="text-weight-bold"
                 style="font-size: 16px; color: #94a3b8"
-                >{{ paciente.consultorio }}</span
+                >{{ paciente.consultorio?.nombre }}</span
               >
             </div>
             <div class="row justify-between q-mb-sm" style="width: 230px">
@@ -73,7 +73,7 @@
               <span
                 class="text-weight-bold"
                 style="font-size: 16px; color: #94a3b8"
-                >{{ paciente.nutricionista }}</span
+                >{{ paciente.nutricionista?.nombre }}</span
               >
             </div>
           </q-card-section>
@@ -81,7 +81,13 @@
           <q-card-section class="col-4 q-pl-xl">
             <div class="row justify-between items-center q-mt-md q-mb-md">
               <p class="text-weight-bold q-mb-none">Datos Adicionales</p>
-              <q-btn color="primary" label="Editar" flat text-color="primary" />
+              <q-btn
+                color="primary"
+                label="Editar"
+                flat
+                text-color="primary"
+                :to="{ name: 'EditarPaciente', params: { id: paciente.id } }"
+              />
             </div>
             <div class="row justify-between q-mb-sm" style="">
               <span class="text-weight-bold" style="font-size: 16px"

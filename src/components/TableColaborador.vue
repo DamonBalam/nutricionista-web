@@ -145,13 +145,14 @@ const handleEdit = (data: any) => {
       :rows="items"
       :columns="columns"
       row-key="name"
-      :hide-pagination="false"
+      :hide-pagination="true"
       table-header-class="bg-accent text-black border-accent text-weight-bold"
       :separator="'cell'"
       :loading="loading"
+
       no-data-label="No se han encontrado registros"
       rows-per-page-label="Filas por página"
-      :rows-per-page-options="[3, 5, 10]"
+      :rows-per-page-options="[5]"
     >
       <template v-slot:body-cell-accion="props">
         <q-td :props="props">

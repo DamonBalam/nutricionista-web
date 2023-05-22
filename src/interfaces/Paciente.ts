@@ -1,4 +1,6 @@
 import { IActividadFisica } from './ActividadFisica'
+import { IClinic } from './Clinic'
+import { INutri } from './Nutri'
 import { IObjetivo } from './Objetivo'
 
 export interface ISuscripcion {
@@ -18,12 +20,14 @@ export interface IPaciente {
   alergias: string[]
   condiciones_medicas: string[]
   actividad_fisica_id: number | null
-  actividad_fisica?: IActividadFisica
+  actividad_fisica?: IActividadFisica | null
   objetivo_id: number | null
-  objetivo?: IObjetivo
+  objetivo?: IObjetivo | null
   cita?: { fecha: string }
   consultorio_id: number | null
   nutricionista_id: number | null
+  consultorio?: IClinic | null
+  nutricionista?: INutri | null
   suscripcion?: ISuscripcion | null
 }
 
@@ -39,9 +43,13 @@ export class Paciente implements IPaciente {
   alergias: string[]
   condiciones_medicas: string[]
   actividad_fisica_id: number | null
+  actividad_fisica?: IActividadFisica | null
   objetivo_id: number | null
+  objetivo?: IObjetivo | null
   consultorio_id: number | null
   nutricionista_id: number | null
+  consultorio?: IClinic | null
+  nutricionista?: INutri | null
   suscripcion?: ISuscripcion | null
 
   constructor (data: Paciente) {
@@ -56,8 +64,12 @@ export class Paciente implements IPaciente {
       (this.alergias = data.alergias || []),
       (this.condiciones_medicas = data.condiciones_medicas || []),
       (this.actividad_fisica_id = data.actividad_fisica_id || null),
+      (this.actividad_fisica = data.actividad_fisica || null),
       (this.objetivo_id = data.objetivo_id || null),
+      (this.objetivo = data.objetivo || null),
       (this.consultorio_id = data.consultorio_id || null),
+      (this.consultorio = data.consultorio || null),
+      (this.nutricionista = data.nutricionista || null),
       (this.nutricionista_id = data.nutricionista_id || null),
       (this.suscripcion = data.suscripcion || null)
   }

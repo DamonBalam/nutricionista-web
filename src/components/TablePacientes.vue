@@ -4,6 +4,8 @@ import { ref, onMounted } from 'vue'
 import { computed } from '@vue/reactivity'
 import { IPaciente } from '../interfaces/Paciente'
 import { pacienteDataServices } from 'src/services/PacienteDataService'
+import { nutriDataServices } from '../services/NutriDataService'
+import { clinicDataServices } from '../services/ClinicDataService'
 
 const router = useRouter()
 const columns = [
@@ -12,13 +14,6 @@ const columns = [
     label: 'Nombre completo',
     field: 'nombre',
     align: 'left'
-  },
-
-  {
-    name: 'cita',
-    label: 'Fecha ultima cita',
-    field: 'cita',
-    align: 'center'
   },
   {
     name: 'suscripcion',
@@ -57,8 +52,9 @@ const columns = [
 const search = ref('')
 const fecha = ref('')
 const acceso = ref(null)
-const consultorio = ref('')
-const colaborador = ref('')
+const consultorio = ref(null)
+const colaborador = ref(null)
+const showFilters = ref(false)
 
 const options = [
   { label: 'Todos', value: null },
@@ -68,9 +64,13 @@ const options = [
 
 const loading = ref(false)
 const items = ref<any[]>([])
+const nutricionistas = ref<any[]>([])
+const consultorios = ref<any[]>([])
 
 onMounted(async () => {
   await getItems()
+  await getNutricionistas()
+  await getConsultorios()
 })
 
 const getItems = async () => {
@@ -87,124 +87,182 @@ const getItems = async () => {
   }
   loading.value = false
 }
+
+const getNutricionistas = async () => {
+  try {
+    const data = await nutriDataServices.getNutriologas()
+
+    if (data.code === 200) {
+      nutricionistas.value = data.data
+      // console.log(data.data)
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const getConsultorios = async () => {
+  try {
+    const data = await clinicDataServices.getClinics()
+
+    if (data.code === 200) {
+      consultorios.value = data.data
+      // console.log(data.data)
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 const fechaActual = computed(() => {
   const fechaActual = new Date().toISOString().substr(0, 10)
   return fechaActual
 })
 
-function isFechaEnRango(fechaInicio: string, fechaFin: string) {
+function isFechaEnRango(fechaInicio: any, fechaFin: any) {
   return fechaActual.value >= fechaInicio && fechaActual.value <= fechaFin
 }
-// const pacientesFiltered = computed(() => {
-//   return items.value.filter((item: IPaciente) => {
-//     const coincideNombre =
-//       search.value === '' ||
-//       item.nombre.toLocaleLowerCase().includes(search.value.toLocaleLowerCase())
-//     const coincideAcceso = acceso.value === null || item.acceso === acceso.value
-//     const coincideConsultorio =
-//       consultorio.value === '' || item.consultorio === consultorio.value
-//     const coincideFecha = fecha.value === '' || item.fecha === fecha.value
-//     // const coincideColaborador = colaborador.value === null || item.colaborador === colaborador.value
 
-//     return (
-//       coincideNombre && coincideAcceso && coincideConsultorio && coincideFecha
-//     )
-//   })
-// })
+const pacientesFiltered = computed(() => {
+  return items.value.filter((item: IPaciente) => {
+    const coincideNombre =
+      search.value === '' ||
+      item.nombre.toLocaleLowerCase().includes(search.value.toLocaleLowerCase())
+    const coincideAcceso =
+      acceso.value === null ||
+      isFechaEnRango(item.suscripcion?.empieza, item.suscripcion?.termina) ===
+        acceso.value
+    const coincideConsultorio =
+      consultorio.value === null || item.consultorio?.nombre === consultorio.value
+    const coincideColaborador =
+      colaborador.value === null || item.nutricionista?.nombre === colaborador.value
+    const coincideFecha = fecha.value === '' || item.cita?.fecha === fecha.value
+
+    return (
+      coincideNombre &&
+      coincideAcceso &&
+      coincideConsultorio &&
+      coincideColaborador &&
+      coincideFecha
+    )
+  })
+})
 
 const getPerfil = (id: string) => {
-  console.log(id)
-
   router.push({ name: 'PerfilPaciente', params: { id } })
+}
+const getEditar = (id: string) => {
+  router.push({ name: 'EditarPaciente', params: { id } })
 }
 </script>
 <template>
   <div class="q-mt-lg q-pt-lg">
-    <p class="text-black text-bold text-h5 q-mb-lg">Lista de pacientes</p>
-    <div class="row justify-between">
-      <q-input
-        rounded
-        class="q-mr-xs"
-        v-model="fecha"
-        type="date"
-        outlined
-        dense
-        label="Fecha"
-        bg-color="white"
-        style="width: 240px"
-      >
-      </q-input>
-      <q-select
-        rounded
-        class="q-mr-xs"
-        v-model="acceso"
-        :options="options"
-        outlined
-        dense
-        label="Acceso"
-        bg-color="white"
-        style="width: 240px"
-        emit-value
-        map-options
-      >
-        <template v-slot:append>
-          <q-icon name="search" />
-        </template>
-      </q-select>
-      <q-input
-        rounded
-        class="q-mr-xs"
-        v-model="consultorio"
-        outlined
-        dense
-        label="Consultorio"
-        bg-color="white"
-        style="width: 240px"
-      >
-        <template v-slot:append>
-          <q-icon name="search" />
-        </template>
-      </q-input>
-      <q-input
-        rounded
-        class="q-mr-xs"
-        v-model="colaborador"
-        outlined
-        dense
-        label="Nutricionista"
-        bg-color="white"
-        style="width: 240px"
-      >
-        <template v-slot:append>
-          <q-icon name="search" />
-        </template>
-      </q-input>
-      <q-input
-        rounded
-        class="q-mr-xs"
-        v-model="search"
-        outlined
-        dense
-        label="Buscar paciente"
-        bg-color="white"
-        style="width: 240px"
-      >
-        <template v-slot:append>
-          <q-icon name="search" />
-        </template>
-      </q-input>
-      <q-btn
-        :to="{ name: 'NuevoPaciente' }"
-        label="Nuevo Paciente"
-        color="primary"
-        :icon="'add'"
-      />
+    <div class="row justify-between items-center">
+      <p class="text-black text-bold text-h5">Lista de pacientes</p>
+
+      <div class="row">
+        <q-input
+          class="q-mr-sm"
+          v-model="search"
+          outlined
+          dense
+          label="Buscar paciente"
+          bg-color="white"
+          style="width: 300px;"
+        >
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+
+        <q-btn
+          @click="showFilters = !showFilters"
+          label="Filtros"
+          color="accent"
+          :icon="'o_filter_alt'"
+          class="q-mr-sm text-black"
+        />
+        <q-btn
+          :to="{ name: 'NuevoPaciente' }"
+          label="Nuevo Paciente"
+          color="primary"
+          :icon="'add'"
+        />
+      </div>
+    </div>
+    <div class="row q-col-gutter-sm q-mt-sm" v-if="showFilters">
+      <!-- <div class="col-2">
+        <q-input
+          class="q-mr-xs"
+          v-model="fecha"
+          type="date"
+          outlined
+          dense
+          label="Fecha"
+          bg-color="white"
+        />
+      </div> -->
+      <div class="col-2">
+        <q-select
+          class="q-mr-xs"
+          v-model="acceso"
+          :options="options"
+          outlined
+          dense
+          label="Acceso"
+          bg-color="white"
+          emit-value
+          map-options
+        >
+        </q-select>
+      </div>
+
+      <div class="col-4">
+        <q-select
+          outlined
+          dense
+          v-model="consultorio"
+          bg-color="white"
+          label="Consultorio"
+          :options="
+            consultorios.map(item => {
+              return {
+                label: item.name,
+                value: item.name
+              }
+            })
+          "
+          emit-value
+          map-options
+          clearable
+        />
+      </div>
+      <div class="col-4">
+        <q-select
+          outlined
+          dense
+          v-model="colaborador"
+          bg-color="white"
+          label="Nutricionistas"
+          :options="
+            nutricionistas.map(item => {
+              return {
+                label: item.nombre,
+                value: item.nombre
+              }
+            })
+          "
+          emit-value
+          map-options
+          clearable
+        />
+      </div>
     </div>
   </div>
   <div class="q-mt-lg">
     <q-table
       flat
-      :rows="items"
+      :rows="pacientesFiltered"
       :columns="columns"
       row-key="name"
       table-header-class="bg-accent text-black border-accent text-weight-bold"
@@ -249,6 +307,24 @@ const getPerfil = (id: string) => {
           </q-chip>
         </q-td>
       </template>
+      <template v-slot:body-cell-consultorio="props">
+        <q-td key="consultorio" :props="props">
+          {{
+            props.row.consultorio !== null
+              ? props.row.consultorio.nombre
+              : 'No hay registro'
+          }}
+        </q-td>
+      </template>
+      <template v-slot:body-cell-nutricionista="props">
+        <q-td key="nutricionista" :props="props">
+          {{
+            props.row.nutricionista !== null
+              ? props.row.nutricionista.nombre
+              : 'No hay registro'
+          }}
+        </q-td>
+      </template>
       <template v-slot:body-cell-accion="props">
         <q-td :props="props">
           <q-btn flat round color="black" icon="more_vert">
@@ -261,7 +337,7 @@ const getPerfil = (id: string) => {
                 >
                   <q-item-section>Perfil</q-item-section>
                 </q-item>
-                <q-item clickable v-close-popup>
+                <q-item clickable v-close-popup  @click="getEditar(props.row.id)">
                   <q-item-section>Editar</q-item-section>
                 </q-item>
                 <!-- <q-item clickable v-close-popup>

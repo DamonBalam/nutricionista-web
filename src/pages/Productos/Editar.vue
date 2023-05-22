@@ -2,7 +2,7 @@
   <q-page class="fondo-gris q-py-md q-px-md">
     <!-- <BotonBack url="/productos" /> -->
     <div class="q-mx-md q-mt-sm">
-      <span class="text-black text-bold text-h5">Producto Nuevo</span>
+      <span class="text-black text-bold text-h5">Editar Producto</span>
     </div>
     <div class="row q-mt-md">
       <div class="col-5 q-px-md">
@@ -101,18 +101,18 @@
                     <div class="text-h6">{{ item.nombre }}</div>
                     <q-btn
                       :label="
-                        category === item
+                        category?.id === item.id
                           ? 'Categoría Seleccionada'
                           : 'Seleccionar'
                       "
-                      :color="category !== item ? 'black' : 'primary'"
-                      :outline="category !== item"
+                      :color="category?.id !== item.id ? 'black' : 'primary'"
+                      :outline="category?.id !== item.id"
                       unelevated
                       @click="selectedCategory(item)"
                     />
                   </div>
                 </q-card-section>
-                <template v-if="category === item">
+                <template v-if="category?.id === item.id">
                   <q-card
                     flat
                     bordered
@@ -127,12 +127,14 @@
                         <q-btn
                           unelevated
                           :label="
-                            subcategory === subItem
+                            subcategory?.id === subItem.id
                               ? 'Subcategoria Seleccionada'
                               : 'Seleccionar subcategoria'
                           "
-                          :color="subcategory !== subItem ? 'black' : 'primary'"
-                          :outline="subcategory !== subItem"
+                          :color="
+                            subcategory?.id !== subItem.id ? 'black' : 'primary'
+                          "
+                          :outline="subcategory?.id !== subItem.id"
                           @click="selectedSubcategory(subItem)"
                         />
                       </div>
@@ -154,9 +156,8 @@
         style="width: 200px"
       />
       <q-btn
-        label="Guardar"
+        label="Actualizar"
         color="primary"
-        :disabled="disabled"
         class="q-mt-md q-mr-md"
         @click="onSubmit"
         style="width: 200px"
@@ -179,17 +180,44 @@ const search = ref('')
 const category = ref(null)
 const subcategory = ref(null)
 
+const CategoryComputed = computed(() => {
+  return category.value
+})
+const SubcategoryComputed = computed(() => {
+  return subcategory.value
+})
+
+const props = defineProps({
+  id: {
+    type: String,
+    required: true
+  }
+})
+
 const formProducto = reactive({
   nombre: '',
   cantidad_producto: '',
   intercambio_nutricional: '',
   detalles_adicionales: ''
 })
-const formProductoDefault = reactive({
-  nombre: '',
-  cantidad_producto: '',
-  intercambio_nutricional: '',
-  detalles_adicionales: ''
+
+onMounted(async () => {
+  await getItems()
+  const res = await productoDataServices.getProductoById(props.id)
+
+  if (res.code == 200) {
+    await selectedCategory(res.data.producto.subcategoria.categoria)
+    await selectedSubcategory({
+      id: res.data.producto.subcategoria.id,
+      nombre: res.data.producto.subcategoria.nombre,
+      categoria_id: res.data.producto.subcategoria.categoria_id
+    })
+    formProducto.nombre = res.data.producto.nombre
+    formProducto.cantidad_producto = res.data.producto.cantidad_producto
+    formProducto.intercambio_nutricional =
+      res.data.producto.intercambio_nutricional
+    formProducto.detalles_adicionales = res.data.producto.detalles_adicionales
+  }
 })
 
 //buscador de categorias
@@ -215,8 +243,6 @@ function selectedSubcategory(item: any) {
 }
 
 async function onSubmit() {
-  console.log(formProducto)
-
   const data = {
     nombre: formProducto.nombre,
     cantidad_producto: formProducto.cantidad_producto,
@@ -225,10 +251,9 @@ async function onSubmit() {
     subcategoria_id: subcategory.value?.id
   }
 
-  const res = await productoDataServices.saveProducto(data)
+  const res = await productoDataServices.updateProducto(props.id, data)
 
   if (res.code === 200) {
-    console.log('Producto creado')
     router.push('/productos')
   }
 }
@@ -243,10 +268,6 @@ function onReset() {
 
   router.push('/productos')
 }
-
-onMounted(async () => {
-  await getItems()
-})
 
 const getItems = async () => {
   // loading.value = true

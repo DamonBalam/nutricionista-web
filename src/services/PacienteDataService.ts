@@ -8,7 +8,7 @@ class PacienteDataService {
     return response.data
   }
 
-  async getById (id: string): Promise<IResponse<{user:IPaciente}>> {
+  async getById (id: string): Promise<IResponse<{ user: IPaciente }>> {
     let response = await API.get(`show/user/${id}`, {})
     return response.data
   }
@@ -21,7 +21,7 @@ class PacienteDataService {
   }
 
   async updatePaciente (
-    id: number,
+    id: string,
     data: IPaciente
   ): Promise<IResponse<IPaciente>> {
     let response = await API.post(`update/user/${id}`, {

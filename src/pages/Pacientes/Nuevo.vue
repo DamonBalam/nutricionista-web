@@ -135,8 +135,10 @@
                   <template v-slot:option="scope">
                     <q-item v-bind="scope.itemProps">
                       <q-item-section>
-                        <q-item-label>{{ scope.opt.label }}</q-item-label>
-                        <q-item-label caption>{{
+                        <q-item-label style="font-size: 14px">{{
+                          scope.opt.label
+                        }}</q-item-label>
+                        <q-item-label style="font-size: 14px" caption>{{
                           scope.opt.description
                         }}</q-item-label>
                       </q-item-section>
@@ -172,8 +174,10 @@
                   <template v-slot:option="scope">
                     <q-item v-bind="scope.itemProps">
                       <q-item-section>
-                        <q-item-label>{{ scope.opt.label }}</q-item-label>
-                        <q-item-label caption>{{
+                        <q-item-label style="font-size: 14px">{{
+                          scope.opt.label
+                        }}</q-item-label>
+                        <q-item-label caption style="font-size: 14px">{{
                           scope.opt.description
                         }}</q-item-label>
                       </q-item-section>

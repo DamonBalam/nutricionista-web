@@ -1,8 +1,15 @@
 <template>
-  <q-page class="fondo-gris q-py-md q-px-xl">
+  <q-page class="fondo-gris q-py-sm q-px-xl">
     <BotonBack url="/pacientes" />
-    <div class="q-mx-md q-mt-md">
+    <div class="row justify-between items-center q-mx-md q-mt-sm">
       <span class="text-black text-bold text-h5">Resumen del paciente</span>
+      <q-btn
+        color="primary"
+        fab
+        text-color="white"
+        :icon="'o_edit'"
+        :to="{ name: 'EditarPaciente', params: { id: paciente.id } }"
+      />
     </div>
     <div class="row q-mx-md q-mt-sm">
       <div class="col-12 q-mb-xs">
@@ -81,13 +88,7 @@
           <q-card-section class="col-4 q-pl-xl">
             <div class="row justify-between items-center q-mt-md q-mb-md">
               <p class="text-weight-bold q-mb-none">Datos Adicionales</p>
-              <q-btn
-                color="primary"
-                label="Editar"
-                flat
-                text-color="primary"
-                :to="{ name: 'EditarPaciente', params: { id: paciente.id } }"
-              />
+              <!--  -->
             </div>
             <div class="row justify-between q-mb-sm" style="">
               <span class="text-weight-bold" style="font-size: 16px"

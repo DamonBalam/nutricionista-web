@@ -2,11 +2,12 @@
   "name": "nutricionista-web",
   "version": "0.0.1",
   "description": "Nutricionista project",
-  "productName": "Nutricionista App",
+  "productName": "Natalia Segura Web",
   "author": "Arturo Saldivar <damonbalam@gmail.com>",
   "private": true,
   "scripts": {
-    "test": "echo \"No test specified\" && exit 0"
+    "test": "echo \"No test specified\" && exit 0",
+    "icons":"icongenie generate -i AppIcon2.png --skip-trim --theme-color 229857 "
   },
   "dependencies": {
     "axios": "^1.2.1",

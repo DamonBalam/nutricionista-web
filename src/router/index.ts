@@ -1,12 +1,9 @@
-import { route } from 'quasar/wrappers';
-import {
-  createMemoryHistory,
-  createRouter,
-  createWebHashHistory,
-  createWebHistory,
-} from 'vue-router';
+import { route } from 'quasar/wrappers'
+import { useAuthStore } from 'stores/auth'
+import { LocalStorage, SessionStorage } from 'quasar'
+import { createRouter, createWebHistory } from 'vue-router'
 
-import routes from './routes';
+import routes from './routes'
 
 /*
  * If not building with SSR mode, you can
@@ -29,21 +26,28 @@ export default route(function (/* { store, ssrContext } */) {
     // Leave this as is and make changes in quasar.conf.js instead!
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
-    history: createWebHistory(process.env.VUE_ROUTER_BASE),
+    history: createWebHistory(process.env.VUE_ROUTER_BASE)
     // history: createHistory(process.env.VUE_ROUTER_BASE),
-  });
+  })
 
   Router.beforeEach((to, from, next) => {
-    if (to.matched.some((record) => record.meta.requiresAuth)) {
-      if (localStorage.getItem("access_token")) {
-        next();
+    const access_token = SessionStorage.getItem('access_token')
+    const user = JSON.parse(SessionStorage.getItem('user') || '{}')
+    const store = useAuthStore()
+
+    const { setUser } = store
+
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+      if (access_token != null) {
+        setUser({ user: user, token: access_token })
+        next()
       } else {
-        next({ path: "/login" });
+        next({ path: '/login' })
       }
     } else {
-      next();
+      next()
     }
-  });
+  })
 
-  return Router;
-});
+  return Router
+})

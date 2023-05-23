@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, reactive, computed } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import { INutri } from '../interfaces/Nutri'
 import { nutriDataServices } from '../services/NutriDataService'
 import { roleDataServices } from '../services/RoleDataService'
@@ -32,40 +32,21 @@ const form = reactive({
   rol: null
 })
 const loading = ref(false)
-const colabs = [
-  {
-    name: 'Natalia Segura',
-    email: 'natalia@nutriocionista.com',
-    rol: 'Manager'
-  },
-  {
-    name: 'Rebeca Segura',
-    email: 'rebeca@nutriocionista.com',
-    rol: 'Admin'
-  }
-]
 
 const roles = ref<IRole[]>([])
-
-const rolesComputed = computed(() => {
-  return roles.value.map(role => {
-    return {
-      label: role.name,
-      value: role.id
-    }
-  })
-})
 
 onMounted(async () => {
   await getItems()
   await getRoles()
 })
 
+const rol = ['Nutricionista', 'Admin']
+
 const getRoles = async () => {
   try {
     const data = await roleDataServices.getAll()
     if (data.code === 200) {
-      roles.value = data.data
+      roles.value = data.data.filter(role => rol.includes(role.name))
     }
   } catch (error) {
     console.log(error)
@@ -86,6 +67,7 @@ const getItems = async () => {
 }
 
 const submit = async () => {
+  console.log(form)
   if (myForm.value?.validate()) {
     try {
       if (form.id === null) {
@@ -109,7 +91,7 @@ const submit = async () => {
         const data = await nutriDataServices.updateNutricionista(form.id, {
           nombre: form.nombre,
           email: form.email,
-          rol: form.rol.name
+          rol: form.rol
         })
         if (data.code === 200) {
           $q.notify({
@@ -178,20 +160,23 @@ const handleEdit = (data: any) => {
     >
       <template v-slot:body-cell-accion="props">
         <q-td :props="props">
-          <div>
+          <q-btn
+            round
+            color="primary"
+            :icon="'o_edit'"
+            @click="handleEdit(props)"
+          />
+          <!-- <div>
             <q-btn flat round color="black" icon="more_vert">
               <q-menu>
                 <q-list style="min-width: 100px">
                   <q-item clickable v-close-popup @click="handleEdit(props)">
                     <q-item-section>Editar</q-item-section>
                   </q-item>
-                  <!-- <q-item clickable v-close-popup>
-                    <q-item-section>New incognito tab</q-item-section>
-                  </q-item> -->
                 </q-list>
               </q-menu>
             </q-btn>
-          </div>
+          </div> -->
         </q-td>
       </template>
     </q-table>

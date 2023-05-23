@@ -1,6 +1,6 @@
 <template>
   <q-page class="fondo-gris q-py-sm q-px-xl">
-    <BotonBack url="/pacientes" />
+    <BotonBack :url="`/pacientes`" />
     <div class="row justify-between items-center q-mx-md q-mt-sm">
       <span class="text-black text-bold text-h5">Resumen del paciente</span>
       <q-btn
@@ -19,7 +19,7 @@
               <q-avatar size="80px" class="q-mt-sm">
                 <img src="../../assets/images.png" />
               </q-avatar>
-              <span class="text-weight-bold q-mt-xs" style="font-size: 20px">{{
+              <span class="text-weight-bold q-mt-xs" style="font-size: 18px">{{
                 paciente.nombre +
                 ' ' +
                 paciente.apellido_paterno +
@@ -33,12 +33,12 @@
                 paciente.email
               }}</span>
               <q-toggle
-                v-model="getAcceso"
-                disable
+                v-model="acceso"
                 checked-icon="check"
                 color="primary"
                 :label="getAcceso ? 'Acceso' : 'Sin acceso'"
                 size="xl"
+                @click="handleAcceso"
               />
             </div>
           </q-card-section>
@@ -148,13 +148,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import BotonBack from '../../components/common/BotonBack.vue'
 import TableCitas from '../../components/TableCitas.vue'
 import TableEquivalencias from '../../components/TableEquivalencias.vue'
 import { Paciente, IPaciente } from '../../interfaces/Paciente'
 import { pacienteDataServices } from '../../services/PacienteDataService'
-
+import { useQuasar } from 'quasar'
+const $q = useQuasar()
 const props = defineProps({
   id: {
     type: String,
@@ -199,9 +200,7 @@ const getEdad = computed(() => {
   return calcularEdad(fechaNacimiento)
 })
 
-const getId = computed(() => {
-  return paciente.value.id
-})
+const acceso = ref(false)
 
 const getAcceso = computed(() => {
   const fechaActual = new Date().toISOString().substr(0, 10)
@@ -212,6 +211,46 @@ const getAcceso = computed(() => {
     paciente.value.suscripcion?.termina
   )
 })
+
+watch(
+  () => getAcceso.value,
+  (newVal, oldVal) => {
+    acceso.value = newVal
+  }
+)
+
+const handleAcceso = async () => {
+  try {
+    if (acceso.value) {
+      await pacienteDataServices.enabledAccess(props.id)
+      $q.notify({
+        color: 'green-4',
+        textColor: 'white',
+        icon: 'check_circle',
+        message: 'Se habilito el acceso correctamente',
+        position: 'top-right'
+      })
+    } else {
+      await pacienteDataServices.disabledAccess(props.id)
+      $q.notify({
+        color: 'green-4',
+        textColor: 'white',
+        icon: 'check_circle',
+        message: 'Se deshabilito el acceso correctamente',
+        position: 'top-right'
+      })
+    }
+  } catch (error) {
+    console.log(error)
+    $q.notify({
+      color: 'red-4',
+      textColor: 'white',
+      icon: 'error',
+      message: 'Se produjo un error en el acceso',
+      position: 'top-right'
+    })
+  }
+}
 
 function isFechaEnRango(fecha: any, fechaInicio: any, fechaFin: any) {
   return fecha >= fechaInicio && fecha <= fechaFin

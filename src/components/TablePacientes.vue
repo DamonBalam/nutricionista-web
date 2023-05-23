@@ -133,9 +133,11 @@ const pacientesFiltered = computed(() => {
       isFechaEnRango(item.suscripcion?.empieza, item.suscripcion?.termina) ===
         acceso.value
     const coincideConsultorio =
-      consultorio.value === null || item.consultorio?.nombre === consultorio.value
+      consultorio.value === null ||
+      item.consultorio?.nombre === consultorio.value
     const coincideColaborador =
-      colaborador.value === null || item.nutricionista?.nombre === colaborador.value
+      colaborador.value === null ||
+      item.nutricionista?.nombre === colaborador.value
     const coincideFecha = fecha.value === '' || item.cita?.fecha === fecha.value
 
     return (
@@ -168,7 +170,7 @@ const getEditar = (id: string) => {
           dense
           label="Buscar paciente"
           bg-color="white"
-          style="width: 300px;"
+          style="width: 300px"
         >
           <template v-slot:append>
             <q-icon name="search" />
@@ -327,25 +329,12 @@ const getEditar = (id: string) => {
       </template>
       <template v-slot:body-cell-accion="props">
         <q-td :props="props">
-          <q-btn flat round color="black" icon="more_vert">
-            <q-menu>
-              <q-list style="min-width: 100px">
-                <q-item
-                  clickable
-                  v-close-popup
-                  @click="getPerfil(props.row.id)"
-                >
-                  <q-item-section>Perfil</q-item-section>
-                </q-item>
-                <q-item clickable v-close-popup  @click="getEditar(props.row.id)">
-                  <q-item-section>Editar</q-item-section>
-                </q-item>
-                <!-- <q-item clickable v-close-popup>
-                    <q-item-section>New incognito tab</q-item-section>
-                  </q-item> -->
-              </q-list>
-            </q-menu>
-          </q-btn>
+          <q-btn
+            round
+            color="primary"
+            :icon="'o_visibility'"
+            @click="getPerfil(props.row.id)"
+          />
         </q-td>
       </template>
     </q-table>

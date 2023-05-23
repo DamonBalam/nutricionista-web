@@ -1,6 +1,6 @@
 <template>
   <q-page class="fondo-gris q-py-md q-px-xl">
-    <BotonBack url="/pacientes" />
+    <BotonBack :url="`/pacientes/perfil/${id}`" />
     <div class="q-my-md">
       <span class="text-black text-bold text-h5">Editar Paciente</span>
     </div>

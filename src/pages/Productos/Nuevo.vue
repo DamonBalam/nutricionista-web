@@ -93,7 +93,7 @@
               <q-card
                 flat
                 bordered
-                v-for="item in itemsFiltered"
+                v-for="(item, i) in itemsFiltered"
                 :key="item.id"
               >
                 <q-card-section>
@@ -179,7 +179,38 @@ const router = useRouter()
 const search = ref('')
 const category = ref(null)
 const subcategory = ref(null)
-
+const colors = [
+  '#339933',
+  '#4195F1',
+  '#E60026',
+  '#27C1C1',
+  '#FF005A',
+  '#900020',
+  '#EE890B',
+  '#339933',
+  '#4195F1',
+  '#E60026',
+  '#27C1C1',
+  '#FF005A',
+  '#900020',
+  '#EE890B'
+]
+const colorsSubs = [
+  '#54c654',
+  '#4195F1',
+  '#E60026',
+  '#27C1C1',
+  '#FF005A',
+  '#900020',
+  '#EE890B',
+  '#54c654',
+  '#4195F1',
+  '#E60026',
+  '#27C1C1',
+  '#FF005A',
+  '#900020',
+  '#EE890B'
+]
 const formProducto = reactive({
   nombre: '',
   cantidad_producto: '',

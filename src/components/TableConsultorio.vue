@@ -146,21 +146,23 @@ const handleEdit = (data: any) => {
     >
       <template v-slot:body-cell-accion="props">
         <q-td :props="props">
-          <div>
-            <!-- <q-btn flat round color="black" icon="more_vert" /> -->
+          <q-btn
+            round
+            color="primary"
+            :icon="'o_edit'"
+            @click="handleEdit(props)"
+          />
+          <!-- <div>
             <q-btn flat round color="black" icon="more_vert">
               <q-menu>
                 <q-list style="min-width: 100px">
                   <q-item clickable v-close-popup @click="handleEdit(props)">
                     <q-item-section>Editar</q-item-section>
                   </q-item>
-                  <!-- <q-item clickable v-close-popup>
-                    <q-item-section>New incognito tab</q-item-section>
-                  </q-item> -->
                 </q-list>
               </q-menu>
             </q-btn>
-          </div>
+          </div> -->
         </q-td>
       </template>
     </q-table>

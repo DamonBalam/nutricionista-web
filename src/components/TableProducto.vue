@@ -111,7 +111,13 @@ const getEditar = (id: string) => {
     >
       <template v-slot:body-cell-accion="props">
         <q-td :props="props">
-          <q-btn flat round color="black" icon="more_vert">
+          <q-btn
+            round
+            color="primary"
+            :icon="'o_edit'"
+            @click="getEditar(props.row.id)"
+          />
+          <!-- <q-btn flat round color="black" icon="more_vert">
             <q-menu>
               <q-list style="min-width: 100px">
                 <q-item
@@ -123,7 +129,7 @@ const getEditar = (id: string) => {
                 </q-item>
               </q-list>
             </q-menu>
-          </q-btn>
+          </q-btn> -->
         </q-td>
       </template>
     </q-table>

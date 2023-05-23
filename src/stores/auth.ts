@@ -30,7 +30,7 @@ export const useAuthStore = defineStore('auth', {
     login (payload: any) {
       this.setUser(payload)
       this.setLocalStorage(payload)
-      this.router.push('/inicio')
+      this.router.push('/pacientes')
     },
     async logout () {
       try {

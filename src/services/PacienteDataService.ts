@@ -20,6 +20,16 @@ class PacienteDataService {
     return response.data
   }
 
+  async enabledAccess (id: string): Promise<IResponse<{ user: IPaciente }>> {
+    let response = await API.get(`enable/suscripcion/${id}`, {})
+    return response.data
+  }
+
+  async disabledAccess (id: string): Promise<IResponse<{ user: IPaciente }>> {
+    let response = await API.get(`disable/suscripcion/${id}`, {})
+    return response.data
+  }
+
   async updatePaciente (
     id: string,
     data: IPaciente

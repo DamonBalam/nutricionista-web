@@ -3,7 +3,6 @@ import { RouteRecordRaw } from 'vue-router'
 const routes: RouteRecordRaw[] = [
   {
     path: '/login',
-
     component: () => import('layouts/AuthLayout.vue'),
     children: [
       {
@@ -15,7 +14,10 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/',
-    redirect: '/inicio',
+    redirect: '/pacientes',
+    meta: {
+      requiresAuth: true
+    },
     component: () => import('layouts/MainLayout.vue'),
     children: [
       {
